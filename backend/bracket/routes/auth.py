@@ -1,4 +1,6 @@
 from typing import Any
+from dotenv import load_dotenv
+import os
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -21,6 +23,16 @@ from bracket.utils.security import verify_password
 from bracket.utils.types import assert_some
 from propelauth_fastapi import init_auth
 
+
 router = APIRouter()
 
-auth = init_auth("https://046425272.propelauthtest.com", "bbddd842b0cec6f0c787e97b915ce786495330bb6b3f8f8b838e5183ef2e8055ec776de721b94bd641b918acec523bb4")
+# Load environment variables from .env file
+load_dotenv('dev_backend.env')
+
+# Accessing variables
+PROP_AUTH_URL = os.getenv('PROP_AUTH_URL')
+PROP_AUTH_SECRET = os.getenv('PROP_AUTH_SECRET')
+
+print(PROP_AUTH_URL)
+
+auth = init_auth(PROP_AUTH_URL, PROP_AUTH_SECRET)
