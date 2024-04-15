@@ -37,7 +37,7 @@ export default function TournamentPage() {
   const { t } = useTranslation();
 
   const swrTournamentResponse = getTournamentById(tournamentData.id);
-  checkForAuthError(swrTournamentResponse);
+  // checkForAuthError(swrTournamentResponse);
   const swrStagesResponse: SWRResponse = getStages(id);
   const [onlyRecommended, setOnlyRecommended] = useRouterQueryState('only-recommended', 'true');
   const [eloThreshold, setEloThreshold] = useRouterQueryState('max-elo-diff', 100);

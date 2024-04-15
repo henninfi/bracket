@@ -14,7 +14,6 @@ from bracket.cronjobs.scheduling import start_cronjobs
 from bracket.database import database
 from bracket.models.metrics import RequestDefinition, get_request_metrics
 from bracket.routes import (
-    auth,
     clubs,
     courts,
     internals,
@@ -59,7 +58,6 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 routers = {
     "Internals": internals.router,
-    "Auth": auth.router,
     "Clubs": clubs.router,
     "Courts": courts.router,
     "Matches": matches.router,

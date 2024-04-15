@@ -8,7 +8,7 @@ services:
             - "3000:3000"
         environment:
             NEXT_PUBLIC_API_BASE_URL: "http://localhost:8400"
-            NEXT_PUBLIC_HCAPTCHA_SITE_KEY: "10000000-ffff-ffff-ffff-000000000001"  # Public test key
+            NEXT_PUBLIC_HCAPTCHA_SITE_KEY: "de5be59d-4171-4135-8c89-a549fdeaf3b6"  # Public test key
         restart: unless-stopped
 
     bracket-backend:
@@ -17,16 +17,22 @@ services:
         ports:
             - "8400:8400"
         environment:
-            ENVIRONMENT: "DEVELOPMENT"
-            PG_DSN: "postgresql://bracket_dev:bracket_dev@postgres:5432/bracket_dev"
+            ENVIRONMENT: "PRODUCTION"
+            PG_DSN: "postgresql://default:qb0wRci3QsYX@ep-tight-bonus-209614-pooler.us-east-1.postgres.vercel-storage.com:5432/no-table-tennis-tournament-dev"
+            jwt_secret: "3895y6vb928vy220894ytuv24iuyf2od23xxb32ghr7i5y2aw32av5aqvcqf44tq"
+            CORS_ORIGINS: "http://tournaments-api.rankit.no, http://localhost:3000"
+            # CORS_ORIGIN_REGEX: "https://.*\.vercel\.app"
+            SENTRY_DSN: "https://e5bd1e2f9f3484e84892909de54e397e@o4506953854484480.ingest.us.sentry.io/4506953858678784"
+            ALLOW_USER_REGISTRATION: false
+            ALLOW_INSECURE_HTTP_SSO: false
+            CAPTCHA_SECRET: "de5be59d-4171-4135-8c89-a549fdeaf3b6"
+            AUTO_RUN_MIGRATIONS: true
         restart: unless-stopped
-        depends_on:
-          - postgres
 
-    postgres:
-        image: postgres
-        restart: always
-        environment:
-          POSTGRES_DB: bracket_dev
-          POSTGRES_USER: bracket_dev
-          POSTGRES_PASSWORD: bracket_dev
+    # postgres:
+    #     image: postgres
+    #     restart: always
+    #     environment:
+    #       POSTGRES_DB: bracket_dev
+    #       POSTGRES_USER: bracket_dev
+    #       POSTGRES_PASSWORD: bracket_dev

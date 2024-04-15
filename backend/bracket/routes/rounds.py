@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.database import database
 from bracket.logic.ranking.elo import recalculate_ranking_for_tournament_id
@@ -12,8 +13,9 @@ from bracket.models.db.round import (
 )
 from bracket.models.db.user import UserPublic
 from bracket.models.db.util import RoundWithMatches
-from bracket.routes.auth import user_authenticated_for_tournament
+from bracket.routes.auth import auth
 from bracket.routes.models import SuccessResponse
+from bracket.routes.users import get_user_by_id
 from bracket.routes.util import (
     round_dependency,
     round_with_matches_dependency,
@@ -24,15 +26,17 @@ from bracket.sql.stage_items import get_stage_item
 from bracket.sql.stages import get_full_tournament_details
 from bracket.sql.validation import check_foreign_keys_belong_to_tournament
 from bracket.utils.id_types import RoundId, TournamentId
+from bracket.utils.types import assert_some
+
 
 router = APIRouter()
 
 
-@router.delete("/tournaments/{tournament_id}/rounds/{round_id}", response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/rounds/{round_id}", tags = ["players"], response_model=SuccessResponse)
 async def delete_round(
     tournament_id: TournamentId,
     round_id: RoundId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     round_with_matches: RoundWithMatches = Depends(round_with_matches_dependency),
 ) -> SuccessResponse:
     if len(round_with_matches.matches) > 0:
@@ -50,12 +54,13 @@ async def delete_round(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/rounds", response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/rounds", tags = ["players"], response_model=SuccessResponse)
 async def create_round(
     tournament_id: TournamentId,
     round_body: RoundCreateBody,
-    user: UserPublic = Depends(user_authenticated_for_tournament),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
+    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     await check_foreign_keys_belong_to_tournament(round_body, tournament_id)
 
     stages = await get_full_tournament_details(tournament_id)
@@ -65,7 +70,7 @@ async def create_round(
         for stage_item in stage.stage_items
         for round_ in stage_item.rounds
     ]
-    check_requirement(existing_rounds, user, "max_rounds")
+    check_requirement(existing_rounds, public_user, "max_rounds")
 
     stage_item = await get_stage_item(tournament_id, stage_item_id=round_body.stage_item_id)
 
@@ -92,12 +97,12 @@ async def create_round(
     return SuccessResponse()
 
 
-@router.put("/tournaments/{tournament_id}/rounds/{round_id}", response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}/rounds/{round_id}", tags = ["players"], response_model=SuccessResponse)
 async def update_round_by_id(
     tournament_id: TournamentId,
     round_id: RoundId,
     round_body: RoundUpdateBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     __: Round = Depends(round_dependency),
 ) -> SuccessResponse:
     await set_round_active_or_draft(

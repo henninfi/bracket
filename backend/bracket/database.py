@@ -21,7 +21,19 @@ async def asyncpg_init(connection: Any) -> None:
             schema="pg_catalog",
         )
 
+# # Define the event listener function
+# def set_schema(dbapi_connection, connection_record):
+#     cursor = dbapi_connection.cursor()
+#     cursor.execute("SET search_path TO test;")
+#     cursor.close()
+
 
 database = Database(str(config.pg_dsn), init=asyncpg_init)
 
 engine = sqlalchemy.create_engine(str(config.pg_dsn))
+
+# # Establish a connection
+# connection = engine.connect()
+
+# # Attach the event listener
+# sqlalchemy.event.listen(engine, 'connect', set_schema)

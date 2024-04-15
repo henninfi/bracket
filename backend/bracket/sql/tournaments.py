@@ -28,7 +28,7 @@ async def sql_get_tournament_by_endpoint_name(endpoint_name: str) -> Tournament 
 
 
 async def sql_get_tournaments(
-    club_ids: tuple[int, ...], endpoint_name: str | None = None
+    club_ids: tuple[str, ...], endpoint_name: str | None = None
 ) -> list[Tournament]:
     query = """
         SELECT *

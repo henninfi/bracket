@@ -52,6 +52,7 @@ subscription_lookup = {
 
 
 def check_requirement(array: list[Any], user: UserBase, attribute: str, additions: int = 1) -> None:
+    print(user)
     subscription = subscription_lookup[user.account_type]
     constraint: int = getattr(subscription, attribute)
     if len(array) + additions > constraint:

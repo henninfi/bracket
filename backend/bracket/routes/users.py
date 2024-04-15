@@ -3,6 +3,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException
 from heliclockter import datetime_utc, timedelta
 from starlette import status
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.config import config
 from bracket.models.db.account import UserAccountType
@@ -14,13 +15,8 @@ from bracket.models.db.user import (
     UserToRegister,
     UserToUpdate,
 )
-from bracket.routes.auth import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    Token,
-    create_access_token,
-    user_authenticated,
-)
-from bracket.routes.models import SuccessResponse, TokenResponse, UserPublicResponse
+from bracket.routes.auth import auth
+from bracket.routes.models import SuccessResponse, UserPublicResponse
 from bracket.sql.users import (
     check_whether_email_is_in_use,
     create_user,
@@ -35,27 +31,30 @@ from bracket.utils.types import assert_some
 router = APIRouter()
 
 
-@router.get("/users/me", response_model=UserPublicResponse)
-async def get_user(user_public: UserPublic = Depends(user_authenticated)) -> UserPublicResponse:
+@router.get("/users/me", tags = ["users"], response_model=UserPublicResponse)
+async def get_user(user: User_propelauth = Depends(auth.require_user)) -> UserPublicResponse:
+    user_public = await get_user_by_id(assert_some(user.properties['bracket_id']))
     return UserPublicResponse(data=user_public)
 
 
-@router.get("/users/{user_id}", response_model=UserPublicResponse)
+@router.get("/users/{user_id}", tags = ["users"], response_model=UserPublicResponse)
 async def get_me(
-    user_id: UserId, user_public: UserPublic = Depends(user_authenticated)
+    user_id: UserId, user: User_propelauth = Depends(auth.require_user)
 ) -> UserPublicResponse:
+    user_public = await get_user_by_id(assert_some(user.properties['bracket_id']))
     if user_public.id != user_id:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Can't view details of this user")
 
     return UserPublicResponse(data=user_public)
 
 
-@router.put("/users/{user_id}", response_model=UserPublicResponse)
+@router.put("/users/{user_id}", tags = ["users"], response_model=UserPublicResponse)
 async def update_user_details(
     user_id: UserId,
     user_to_update: UserToUpdate,
-    user_public: UserPublic = Depends(user_authenticated),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> UserPublicResponse:
+    user_public = await get_user_by_id(assert_some(user.properties['bracket_id']))
     if user_public.id != user_id:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Can't change details of this user")
 
@@ -64,19 +63,20 @@ async def update_user_details(
     return UserPublicResponse(data=assert_some(user_updated))
 
 
-@router.put("/users/{user_id}/password", response_model=SuccessResponse)
+@router.put("/users/{user_id}/password", tags = ["users"], response_model=SuccessResponse)
 async def put_user_password(
     user_id: UserId,
     user_to_update: UserPasswordToUpdate,
-    user_public: UserPublic = Depends(user_authenticated),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
+    user_public = await get_user_by_id(assert_some(user.properties['bracket_id']))
     assert user_public.id == user_id
     await update_user_password(assert_some(user_public.id), hash_password(user_to_update.password))
     return SuccessResponse()
 
 
-@router.post("/users/register", response_model=TokenResponse)
-async def register_user(user_to_register: UserToRegister) -> TokenResponse:
+@router.post("/users/register", tags = ["users"])
+async def register_user(user_to_register: UserToRegister, ):
     if not config.allow_user_registration:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Account creation is unavailable for now")
 
@@ -94,19 +94,12 @@ async def register_user(user_to_register: UserToRegister) -> TokenResponse:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email address already in use")
 
     user_created = await create_user(user)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"user": user_created.email}, expires_delta=access_token_expires
-    )
-    return TokenResponse(
-        data=Token(
-            access_token=access_token, token_type="bearer", user_id=assert_some(user_created.id)
-        )
-    )
+   
+    return user_created.id
 
 
-@router.post("/users/register_demo", response_model=TokenResponse)
-async def register_demo_user(user_to_register: DemoUserToRegister) -> TokenResponse:
+@router.post("/users/register_demo", tags = ["users"])
+async def register_demo_user(user_to_register: DemoUserToRegister):
     if not config.allow_demo_user_registration:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED, "Demo account creation is unavailable for now"
@@ -127,12 +120,5 @@ async def register_demo_user(user_to_register: DemoUserToRegister) -> TokenRespo
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email address already in use")
 
     user_created = await create_user(user)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"user": user_created.email}, expires_delta=access_token_expires
-    )
-    return TokenResponse(
-        data=Token(
-            access_token=access_token, token_type="bearer", user_id=assert_some(user_created.id)
-        )
-    )
+    
+    return user_created.id

@@ -17,7 +17,7 @@ export default function HomePage() {
   const { t } = useTranslation();
 
   const swrUserResponse = getUser();
-  checkForAuthError(swrUserResponse);
+  // checkForAuthError(swrUserResponse);
   const user = swrUserResponse.data != null ? swrUserResponse.data.data : null;
 
   let content;

@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from enum import auto
-from typing import Annotated
+from typing import Annotated, List
 
 import sentry_sdk
 from pydantic import Field, PostgresDsn
@@ -35,10 +35,10 @@ class Config(BaseSettings):
     captcha_secret: str | None = None
     base_url: str = "http://localhost:8400"
     cors_origin_regex: str = ""
-    cors_origins: str = "*"
+    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:3001"]
     jwt_secret: str
     auto_run_migrations: bool = True
-    pg_dsn: PostgresDsn = "postgresql://user:pass@localhost:5432/db"  # type: ignore[assignment]
+    pg_dsn: PostgresDsn = "postgresql://default:qb0wRci3QsYX@ep-tight-bonus-209614-pooler.us-east-1.postgres.vercel-storage.com:5432/no-table-tennis-tournament-dev"  # type: ignore[assignment]
     sentry_dsn: str | None = None
 
 
@@ -47,7 +47,7 @@ class CIConfig(Config):
 
 
 class DevelopmentConfig(Config):
-    admin_email: Annotated[str, Field("test@example.org")]
+    admin_email: Annotated[str, Field("test1@example.org")]
     admin_password: Annotated[str, Field("aeGhoe1ahng2Aezai0Dei6Aih6dieHoo")]
     allow_insecure_http_sso: Annotated[bool, Field(True)]
     jwt_secret: Annotated[

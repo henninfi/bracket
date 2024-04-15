@@ -6,20 +6,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import TournamentModal from '../components/modals/tournament_modal';
 import TournamentsTable from '../components/tables/tournaments';
 import { capitalize } from '../components/utils/util';
-import { getTournaments } from '../services/adapter';
+import { checkForAuthError, getTournaments } from '../services/adapter';
 import Layout from './_layout';
-import { useAuthInfo } from '@propelauth/react'
-import { TournamentsService } from '../client/services/TournamentsService';
-import useSWR from 'swr';
-import { getTournamentEndpointFromRouter } from '../components/utils/util';
-
 
 export default function HomePage() {
-  const authInfo = useAuthInfo();
-
   const swrTournamentsResponse = getTournaments();
-
-  // checkForAuthError(swrTournamentsResponse);
+  checkForAuthError(swrTournamentsResponse);
   const { t } = useTranslation();
 
   return (

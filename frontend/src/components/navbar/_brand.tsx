@@ -13,8 +13,8 @@ export function Brand() {
         }}
       >
         <Group>
-          <Image style={{ width: '38px', marginRight: '0px' }} src="/favicon.svg" />
-          <Title style={{ height: '38px' }}>Bracket</Title>
+          {/* <Image style={{ width: '38px', marginRight: '0px' }} src="/favicon.svg" /> */}
+          <Title style={{ height: '38px' }}><span>RankIt</span></Title>
         </Group>
       </UnstyledButton>
     </Center>

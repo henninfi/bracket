@@ -87,28 +87,28 @@ export function getBaseLinksDict() {
   const { t } = useTranslation();
 
   return [
-    { link: '/clubs', label: capitalize(t('clubs_title')), links: [], icon: IconUsers },
+    // { link: '/clubs', label: capitalize(t('clubs_title')), links: [], icon: IconUsers },
     { link: '/', label: capitalize(t('tournaments_title')), links: [], icon: IconHome },
-    {
-      link: '/user',
-      label: t('user_title'),
-      links: [],
-      icon: IconUser,
-    },
-    {
-      icon: IconDots,
-      link: '',
-      label: t('more_title'),
-      links: [
-        { link: 'https://docs.bracketapp.nl/', label: t('website_title'), icon: IconBrowser },
-        {
-          link: 'https://github.com/evroon/bracket',
-          label: t('github_title'),
-          icon: IconBrandGithub,
-        },
-        { link: `${getBaseApiUrl()}/docs`, label: t('api_docs_title'), icon: IconBook },
-      ],
-    },
+    // {
+    //   link: '/user',
+    //   label: t('user_title'),
+    //   links: [],
+    //   icon: IconUser,
+    // },
+    // {
+    //   icon: IconDots,
+    //   link: '',
+    //   label: t('more_title'),
+    //   links: [
+    //     { link: 'https://docs.bracketapp.nl/', label: t('website_title'), icon: IconBrowser },
+    //     {
+    //       link: 'https://github.com/evroon/bracket',
+    //       label: t('github_title'),
+    //       icon: IconBrandGithub,
+    //     },
+    //     { link: `${getBaseApiUrl()}/docs`, label: t('api_docs_title'), icon: IconBook },
+    //   ],
+    // },
   ];
 }
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.database import database
 from bracket.logic.ranking.elo import recalculate_ranking_for_tournament_id
@@ -9,10 +10,8 @@ from bracket.logic.subscriptions import check_requirement
 from bracket.models.db.stage import Stage, StageActivateBody, StageUpdateBody
 from bracket.models.db.user import UserPublic
 from bracket.models.db.util import StageWithStageItems
-from bracket.routes.auth import (
-    user_authenticated_for_tournament,
-    user_authenticated_or_public_dashboard,
-)
+from bracket.routes.auth import auth
+from bracket.routes.users import get_user_by_id
 from bracket.routes.models import (
     StageItemInputOptionsResponse,
     StagesWithStageItemsResponse,
@@ -28,17 +27,19 @@ from bracket.sql.stages import (
 )
 from bracket.sql.teams import get_teams_with_members
 from bracket.utils.id_types import StageId, TournamentId
+from bracket.utils.types import assert_some
 
 router = APIRouter()
 
 
-@router.get("/tournaments/{tournament_id}/stages", response_model=StagesWithStageItemsResponse)
+@router.get("/tournaments/{tournament_id}/stages", tags = ["stages"], response_model=StagesWithStageItemsResponse)
 async def get_stages(
     tournament_id: TournamentId,
-    user: UserPublic = Depends(user_authenticated_or_public_dashboard),
+    user: User_propelauth = Depends(auth.require_user),
     no_draft_rounds: bool = False,
 ) -> StagesWithStageItemsResponse:
-    if no_draft_rounds is False and user is None:
+    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    if no_draft_rounds is False and public_user is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Can't view draft rounds when not authorized",
@@ -48,11 +49,11 @@ async def get_stages(
     return StagesWithStageItemsResponse(data=stages_)
 
 
-@router.delete("/tournaments/{tournament_id}/stages/{stage_id}", response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/stages/{stage_id}", tags = ["stages"], response_model=SuccessResponse)
 async def delete_stage(
     tournament_id: TournamentId,
     stage_id: StageId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     stage: StageWithStageItems = Depends(stage_dependency),
 ) -> SuccessResponse:
     if len(stage.stage_items) > 0:
@@ -73,24 +74,25 @@ async def delete_stage(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/stages", response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/stages", tags = ["stages"], response_model=SuccessResponse)
 async def create_stage(
     tournament_id: TournamentId,
-    user: UserPublic = Depends(user_authenticated_for_tournament),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
+    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     existing_stages = await get_full_tournament_details(tournament_id)
-    check_requirement(existing_stages, user, "max_stages")
+    check_requirement(existing_stages, public_user, "max_stages")
 
     await sql_create_stage(tournament_id)
     return SuccessResponse()
 
 
-@router.put("/tournaments/{tournament_id}/stages/{stage_id}", response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}/stages/{stage_id}", tags = ["stages"], response_model=SuccessResponse)
 async def update_stage(
     tournament_id: TournamentId,
     stage_id: StageId,
     stage_body: StageUpdateBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     stage: Stage = Depends(stage_dependency),  # pylint: disable=redefined-builtin
 ) -> SuccessResponse:
     values = {"tournament_id": tournament_id, "stage_id": stage_id}
@@ -107,11 +109,11 @@ async def update_stage(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/stages/activate", response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/stages/activate", tags = ["stages"], response_model=SuccessResponse)
 async def activate_next_stage(
     tournament_id: TournamentId,
     stage_body: StageActivateBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
     new_active_stage_id = await get_next_stage_in_tournament(tournament_id, stage_body.direction)
     if new_active_stage_id is None:
@@ -133,7 +135,7 @@ async def activate_next_stage(
 async def get_available_inputs(
     tournament_id: TournamentId,
     stage_id: StageId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     stage: Stage = Depends(stage_dependency),
 ) -> StageItemInputOptionsResponse:
     stages = await get_full_tournament_details(tournament_id)

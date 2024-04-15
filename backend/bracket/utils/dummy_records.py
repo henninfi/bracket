@@ -29,6 +29,7 @@ from bracket.utils.security import hash_password
 DUMMY_MOCK_TIME = datetime_utc(2022, 1, 11, 4, 32, 11, tzinfo=ZoneInfo("UTC"))
 
 # We don't know any db IDs here, so we use a placeholder for foreign keys.
+DB_PLACEHOLDER_UUID = "63e386c2-2897-427a-987a-f014edae632a"
 DB_PLACEHOLDER_ID = -42
 
 DUMMY_CLUB = Club(
@@ -37,7 +38,7 @@ DUMMY_CLUB = Club(
 )
 
 DUMMY_TOURNAMENT = Tournament(
-    club_id=ClubId(DB_PLACEHOLDER_ID),
+    club_id=ClubId(DB_PLACEHOLDER_UUID),
     name="Some Cool Tournament",
     created=DUMMY_MOCK_TIME,
     start_time=DUMMY_MOCK_TIME,

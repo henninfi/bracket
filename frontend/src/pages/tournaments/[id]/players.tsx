@@ -30,6 +30,10 @@ export default function Players() {
             swrPlayersResponse={swrPlayersResponse}
             tournament_id={tournamentData.id}
           />
+          <PlayerCreateModal
+            swrPlayersResponse={swrPlayersResponse}
+            tournament_id={tournamentData.id}
+          />
         </Grid.Col>
       </Grid>
       <PlayersTable

@@ -7,6 +7,7 @@ import useSWR, { SWRResponse } from 'swr';
 import { Pagination } from '../components/utils/util';
 import { SchedulerSettings } from '../interfaces/match';
 import { getLogin, performLogout, tokenPresent } from './local_storage';
+import { OpenAPI } from '../client/core/OpenAPI';
 
 // TODO: This is a workaround for the fact that axios is not properly typed.
 const axios: typeof Axios = require('axios').default;
@@ -57,13 +58,13 @@ export function getBaseApiUrl() {
 }
 
 export function createAxios() {
-  const user = getLogin();
-  const access_token = user != null ? user.access_token : '';
+  // const user = getLogin();
+  // const access_token = user != null ? user.access_token : '';
   return axios.create({
-    baseURL: getBaseApiUrl(),
+    baseURL: OpenAPI.BASE, // Ensure your OpenAPI configuration object has a BASE_URL property
+    withCredentials: OpenAPI.WITH_CREDENTIALS,
     headers: {
-      Authorization: `bearer ${access_token}`,
-      Accept: 'application/json',
+      ...OpenAPI.HEADERS, // Spread existing headers from OpenAPI configuration
     },
   });
 }
@@ -91,10 +92,8 @@ function getTimeState() {
   return { time: new Date() };
 }
 
-const fetcher = (url: string) =>
-  createAxios()
-    .get(url)
-    .then((res: { data: any }) => res.data);
+const fetcher = (url: string) => 
+  createAxios().get(url).then(res => res.data);
 
 const fetcherWithTimestamp = (url: string) =>
   createAxios()

@@ -1,6 +1,6 @@
 from typing import NewType
 
-ClubId = NewType("ClubId", int)
+ClubId = NewType("ClubId", str)
 TournamentId = NewType("TournamentId", int)
 StageId = NewType("StageId", int)
 StageItemId = NewType("StageItemId", int)

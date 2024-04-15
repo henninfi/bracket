@@ -9,12 +9,15 @@ from bracket.models.db.account import UserAccountType
 from bracket.models.db.shared import BaseModelORM
 from bracket.utils.id_types import UserId
 
+from propelauth_fastapi import User  as User_propelauth_fastapi
+
 if TYPE_CHECKING:
     from bracket.logic.subscriptions import Subscription
 
 
 class UserBase(BaseModelORM):
     id: UserId | None = None
+    bracket_id: int | None = None
     email: str
     name: str
     created: datetime_utc
@@ -25,6 +28,13 @@ class UserBase(BaseModelORM):
         from bracket.logic.subscriptions import subscription_lookup
 
         return subscription_lookup[self.account_type]
+    
+    @classmethod
+    def from_object(cls:UserBase, user: User_propelauth_fastapi):
+        cls.bracket_id = user.properties['bracket_id']
+        cls.email = user.email
+
+        return cls
 
 
 class User(UserBase):

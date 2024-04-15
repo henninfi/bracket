@@ -2,11 +2,14 @@ import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/dropzone/styles.css';
-import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import '@mantine/spotlight/styles.css';
 import { appWithTranslation } from 'next-i18next';
 import Head from 'next/head';
+import React from 'react';
+import { RequiredAuthProvider, RedirectToLogin } from '@propelauth/react';
+import type { AppProps } from 'next/app';
+import AuthTokenUpdater from '../components/auth/token_updater';
 
 import { BracketSpotlight } from '../components/modals/spotlight';
 
@@ -42,25 +45,32 @@ function AnalyticsScript() {
   );
 }
 
-const App = ({ Component, pageProps }: any) => (
-  <>
-    <Head>
-      <title>Bracket</title>
-      <meta charSet="UTF-8" />
-      <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="shortcut icon" href="/favicon.svg" />
-      <AnalyticsScript />
+const App = ({ Component, pageProps }: AppProps) => {
+  return (
+    <>
+      <RequiredAuthProvider
+        authUrl={process.env.NEXT_PUBLIC_AUTH_URL!}
+        displayIfLoggedOut={<RedirectToLogin />}
+      >
+        <Head>
+          <title>Bracket</title>
+          <meta charSet="UTF-8" />
+          <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="shortcut icon" href="/favicon.svg" />
+          <AnalyticsScript />
 
-      <ColorSchemeScript defaultColorScheme="auto" />
-    </Head>
+          <ColorSchemeScript defaultColorScheme="auto" />
+        </Head>
+        <AuthTokenUpdater />
+        <MantineProvider defaultColorScheme="auto" theme={theme}>
+          <BracketSpotlight />
+          <Component {...pageProps} />
+        </MantineProvider>
+      </RequiredAuthProvider>
 
-    <MantineProvider defaultColorScheme="auto" theme={theme}>
-      <BracketSpotlight />
-      <Notifications />
-      <Component {...pageProps} />
-    </MantineProvider>
-  </>
-);
+    </>
+  );
+};
 
 export default appWithTranslation(App);

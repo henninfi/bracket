@@ -2,7 +2,7 @@ import { getTournamentEndpointFromRouter } from '../components/utils/util';
 import { createAxios, getTournamentByEndpointName, handleRequestError } from './adapter';
 
 export async function createTournament(
-  club_id: number,
+  club_id: string,
   name: string,
   dashboard_public: boolean,
   dashboard_endpoint: string,

@@ -14,7 +14,7 @@ from bracket.models.db.team import FullTeamWithPlayers, Team
 from bracket.models.db.tournament import Tournament
 from bracket.models.db.user import UserPublic
 from bracket.models.db.util import StageWithStageItems
-from bracket.routes.auth import Token
+from bracket.routes.auth import auth
 
 DataT = TypeVar("DataT")
 
@@ -84,9 +84,6 @@ class SingleTeamResponse(DataResponse[Team]):
 class UserPublicResponse(DataResponse[UserPublic]):
     pass
 
-
-class TokenResponse(DataResponse[Token]):
-    pass
 
 
 class CourtsResponse(DataResponse[list[Court]]):

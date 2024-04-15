@@ -8,6 +8,8 @@ import { SWRResponse } from 'swr';
 
 import { Club } from '../../interfaces/club';
 import { createClub, updateClub } from '../../services/club';
+import { ClubsService } from '../../client';
+import type { ClubCreateBody } from '../../client/models/ClubCreateBody';
 import SaveButton from '../buttons/save';
 
 export default function ClubModal({
@@ -56,8 +58,8 @@ export default function ClubModal({
     <>
       <Modal opened={opened} onClose={() => setOpened(false)} title={operation_text}>
         <form
-          onSubmit={form.onSubmit(async (values) => {
-            if (is_create_form) await createClub(values.name);
+          onSubmit={form.onSubmit(async (values:ClubCreateBody) => {
+            if (is_create_form) await ClubsService.createNewClubClubsPost({requestBody:values});
             else await updateClub(club.id, values.name);
             await swrClubsResponse.mutate();
             setOpened(false);

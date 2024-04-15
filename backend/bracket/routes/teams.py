@@ -5,6 +5,7 @@ import aiofiles
 import aiofiles.os
 from fastapi import APIRouter, Depends, UploadFile
 from heliclockter import datetime_utc
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.database import database
 from bracket.logic.ranking.elo import recalculate_ranking_for_tournament_id
@@ -12,16 +13,14 @@ from bracket.logic.subscriptions import check_requirement
 from bracket.logic.teams import get_team_logo_path
 from bracket.models.db.team import FullTeamWithPlayers, Team, TeamBody, TeamMultiBody, TeamToInsert
 from bracket.models.db.user import UserPublic
-from bracket.routes.auth import (
-    user_authenticated_for_tournament,
-    user_authenticated_or_public_dashboard,
-)
+from bracket.routes.auth import auth
 from bracket.routes.models import (
     PaginatedTeams,
     SingleTeamResponse,
     SuccessResponse,
     TeamsWithPlayersResponse,
 )
+from bracket.routes.users import get_user_by_id
 from bracket.routes.util import team_dependency, team_with_players_dependency
 from bracket.schema import players_x_teams, teams
 from bracket.sql.teams import (
@@ -64,11 +63,11 @@ async def update_team_members(
     await recalculate_ranking_for_tournament_id(tournament_id)
 
 
-@router.get("/tournaments/{tournament_id}/teams", response_model=TeamsWithPlayersResponse)
+@router.get("/tournaments/{tournament_id}/teams", tags = ["teams"], response_model=TeamsWithPlayersResponse)
 async def get_teams(
     tournament_id: TournamentId,
     pagination: PaginationTeams = Depends(),
-    _: UserPublic = Depends(user_authenticated_or_public_dashboard),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> TeamsWithPlayersResponse:
     return TeamsWithPlayersResponse(
         data=PaginatedTeams(
@@ -78,11 +77,11 @@ async def get_teams(
     )
 
 
-@router.put("/tournaments/{tournament_id}/teams/{team_id}", response_model=SingleTeamResponse)
+@router.put("/tournaments/{tournament_id}/teams/{team_id}", tags = ["teams"], response_model=SingleTeamResponse)
 async def update_team_by_id(
     tournament_id: TournamentId,
     team_body: TeamBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     team: Team = Depends(team_dependency),
 ) -> SingleTeamResponse:
     await check_foreign_keys_belong_to_tournament(team_body, tournament_id)
@@ -109,11 +108,11 @@ async def update_team_by_id(
     )
 
 
-@router.post("/tournaments/{tournament_id}/teams/{team_id}/logo", response_model=SingleTeamResponse)
+@router.post("/tournaments/{tournament_id}/teams/{team_id}/logo", tags = ["teams"], response_model=SingleTeamResponse)
 async def update_team_logo(
     tournament_id: TournamentId,
     file: UploadFile | None = None,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     team: Team = Depends(team_dependency),
 ) -> SingleTeamResponse:
     team_id = assert_some(team.id)
@@ -147,10 +146,10 @@ async def update_team_logo(
     return SingleTeamResponse(data=assert_some(await get_team_by_id(team_id, tournament_id)))
 
 
-@router.delete("/tournaments/{tournament_id}/teams/{team_id}", response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/teams/{team_id}", tags = ["teams"], response_model=SuccessResponse)
 async def delete_team(
     tournament_id: TournamentId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     team: FullTeamWithPlayers = Depends(team_with_players_dependency),
 ) -> SuccessResponse:
     with check_foreign_key_violation(
@@ -166,16 +165,17 @@ async def delete_team(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/teams", response_model=SingleTeamResponse)
+@router.post("/tournaments/{tournament_id}/teams", tags = ["teams"], response_model=SingleTeamResponse)
 async def create_team(
     team_to_insert: TeamBody,
     tournament_id: TournamentId,
-    user: UserPublic = Depends(user_authenticated_for_tournament),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> SingleTeamResponse:
+    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     await check_foreign_keys_belong_to_tournament(team_to_insert, tournament_id)
 
     existing_teams = await get_teams_with_members(tournament_id)
-    check_requirement(existing_teams, user, "max_teams")
+    check_requirement(existing_teams, public_user, "max_teams")
 
     last_record_id = await database.execute(
         query=teams.insert(),
@@ -192,15 +192,16 @@ async def create_team(
     return SingleTeamResponse(data=team_result)
 
 
-@router.post("/tournaments/{tournament_id}/teams_multi", response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/teams_multi", tags = ["teams"], response_model=SuccessResponse)
 async def create_multiple_teams(
     team_body: TeamMultiBody,
     tournament_id: TournamentId,
-    user: UserPublic = Depends(user_authenticated_for_tournament),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
+    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     team_names = [team.strip() for team in team_body.names.split("\n") if len(team) > 0]
     existing_teams = await get_teams_with_members(tournament_id)
-    check_requirement(existing_teams, user, "max_teams", additions=len(team_names))
+    check_requirement(existing_teams, public_user, "max_teams", additions=len(team_names))
 
     for team_name in team_names:
         await database.execute(

@@ -69,7 +69,7 @@ function GeneralTournamentForm({
       onSubmit={form.onSubmit(async (values) => {
         assert(values.club_id != null);
         await createTournament(
-          parseInt(values.club_id, 10),
+          values.club_id,
           values.name,
           values.dashboard_public,
           values.dashboard_endpoint,

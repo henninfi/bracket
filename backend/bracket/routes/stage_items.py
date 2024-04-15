@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.database import database
 from bracket.logic.planning.rounds import (
@@ -19,10 +20,9 @@ from bracket.models.db.stage_item import (
 )
 from bracket.models.db.user import UserPublic
 from bracket.models.db.util import StageItemWithRounds
-from bracket.routes.auth import (
-    user_authenticated_for_tournament,
-)
+from bracket.routes.auth import auth
 from bracket.routes.models import SuccessResponse
+from bracket.routes.users import get_user_by_id
 from bracket.routes.util import stage_item_dependency
 from bracket.sql.rounds import set_round_active_or_draft
 from bracket.sql.shared import sql_delete_stage_item_with_foreign_keys
@@ -33,17 +33,18 @@ from bracket.sql.stage_items import (
 from bracket.sql.stages import get_full_tournament_details
 from bracket.sql.validation import check_foreign_keys_belong_to_tournament
 from bracket.utils.id_types import StageItemId, TournamentId
+from bracket.utils.types import assert_some
 
 router = APIRouter()
 
 
 @router.delete(
-    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", response_model=SuccessResponse
+    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", tags = ["stage_items"], response_model=SuccessResponse
 )
 async def delete_stage_item(
     tournament_id: TournamentId,
     stage_item_id: StageItemId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     stage_item: StageItemWithRounds = Depends(stage_item_dependency),
 ) -> SuccessResponse:
     await sql_delete_stage_item_with_foreign_keys(stage_item_id)
@@ -51,12 +52,13 @@ async def delete_stage_item(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/stage_items", response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/stage_items", tags = ["stage_items"], response_model=SuccessResponse)
 async def create_stage_item(
     tournament_id: TournamentId,
     stage_body: StageItemCreateBody,
-    user: UserPublic = Depends(user_authenticated_for_tournament),
+    user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
+    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     if stage_body.team_count != len(stage_body.inputs):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -67,7 +69,7 @@ async def create_stage_item(
 
     stages = await get_full_tournament_details(tournament_id)
     existing_stage_items = [stage_item for stage in stages for stage_item in stage.stage_items]
-    check_requirement(existing_stage_items, user, "max_stage_items")
+    check_requirement(existing_stage_items, public_user, "max_stage_items")
 
     stage_item = await sql_create_stage_item(tournament_id, stage_body)
     await build_matches_for_stage_item(stage_item, tournament_id)
@@ -75,13 +77,13 @@ async def create_stage_item(
 
 
 @router.put(
-    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", response_model=SuccessResponse
+    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", tags = ["stage_items"], response_model=SuccessResponse
 )
 async def update_stage_item(
     tournament_id: TournamentId,
     stage_item_id: StageItemId,
     stage_item_body: StageItemUpdateBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     stage_item: StageItemWithRounds = Depends(stage_item_dependency),
 ) -> SuccessResponse:
     if await get_stage_item(tournament_id, stage_item_id) is None:
@@ -111,7 +113,7 @@ async def start_next_round(
     stage_item_id: StageItemId,
     active_next_body: StageItemActivateNextBody,
     stage_item: StageItemWithRounds = Depends(stage_item_dependency),
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
     __, next_round = get_active_and_next_rounds(stage_item)
     if next_round is None:

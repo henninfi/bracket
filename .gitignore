@@ -14,5 +14,9 @@ node_modules
 coverage.xml
 coverage.json
 
+
 backend/yarn.lock
 backend/static
+backend/venv
+
+frontend/src/client

@@ -7,7 +7,7 @@ import Layout from '../_layout';
 
 export default function TournamentLayout({ children, tournament_id }: any) {
   const tournamentResponse = getTournamentById(tournament_id);
-  checkForAuthError(tournamentResponse);
+  // checkForAuthError(tournamentResponse);
 
   const tournamentLinks = <TournamentLinks tournament_id={tournament_id} />;
   const breadcrumbs = responseIsValid(tournamentResponse) ? (

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.logic.planning.matches import (
     handle_match_reschedule,
@@ -20,7 +21,7 @@ from bracket.models.db.match import (
 from bracket.models.db.round import Round
 from bracket.models.db.user import UserPublic
 from bracket.models.db.util import RoundWithMatches
-from bracket.routes.auth import user_authenticated_for_tournament
+from bracket.routes.auth import auth
 from bracket.routes.models import SingleMatchResponse, SuccessResponse, UpcomingMatchesResponse
 from bracket.routes.util import match_dependency, round_dependency, round_with_matches_dependency
 from bracket.sql.courts import get_all_courts_in_tournament
@@ -35,6 +36,7 @@ router = APIRouter()
 
 @router.get(
     "/tournaments/{tournament_id}/rounds/{round_id}/upcoming_matches",
+    tags = ["matches"],
     response_model=UpcomingMatchesResponse,
 )
 async def get_matches_to_schedule(
@@ -43,7 +45,7 @@ async def get_matches_to_schedule(
     iterations: int = 200,
     only_recommended: bool = False,
     limit: int = 50,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     round_: Round = Depends(round_dependency),
 ) -> UpcomingMatchesResponse:
     match_filter = MatchFilter(
@@ -64,7 +66,7 @@ async def get_matches_to_schedule(
 @router.delete("/tournaments/{tournament_id}/matches/{match_id}", response_model=SuccessResponse)
 async def delete_match(
     tournament_id: TournamentId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     match: Match = Depends(match_dependency),
 ) -> SuccessResponse:
     await sql_delete_match(assert_some(match.id))
@@ -76,7 +78,7 @@ async def delete_match(
 async def create_match(
     tournament_id: TournamentId,
     match_body: MatchCreateBodyFrontend,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> SingleMatchResponse:
     await check_foreign_keys_belong_to_tournament(match_body, tournament_id)
 
@@ -93,7 +95,7 @@ async def create_match(
 @router.post("/tournaments/{tournament_id}/schedule_matches", response_model=SuccessResponse)
 async def schedule_matches(
     tournament_id: TournamentId,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
     await schedule_all_unscheduled_matches(tournament_id)
     return SuccessResponse()
@@ -106,7 +108,7 @@ async def reschedule_match(
     tournament_id: TournamentId,
     match_id: MatchId,
     body: MatchRescheduleBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
     await check_foreign_keys_belong_to_tournament(body, tournament_id)
     await handle_match_reschedule(tournament_id, body, match_id)
@@ -122,7 +124,7 @@ async def create_matches_automatically(
     elo_diff_threshold: int = 100,
     iterations: int = 200,
     only_recommended: bool = False,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     round_: RoundWithMatches = Depends(round_with_matches_dependency),
 ) -> SuccessResponse:
     if not round_.is_draft:
@@ -176,7 +178,7 @@ async def create_matches_automatically(
 async def update_match_by_id(
     tournament_id: TournamentId,
     match_body: MatchBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
     match: Match = Depends(match_dependency),
 ) -> SuccessResponse:
     await check_foreign_keys_belong_to_tournament(match_body, tournament_id)

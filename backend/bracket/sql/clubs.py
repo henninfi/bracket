@@ -7,11 +7,11 @@ from bracket.utils.types import assert_some
 async def create_club(club: ClubCreateBody, user_id: UserId) -> Club:
     async with database.transaction():
         query = """
-            INSERT INTO clubs (name, created)
-            VALUES (:name, NOW())
+            INSERT INTO clubs (id, name, created)
+            VALUES (:id, :name, NOW())
             RETURNING *
             """
-        result = await database.fetch_one(query=query, values={"name": club.name})
+        result = await database.fetch_one(query=query, values={"name": club.name, "id": str(club.id)})
         if result is None:
             raise ValueError("Could not create club")
 
@@ -27,6 +27,14 @@ async def create_club(club: ClubCreateBody, user_id: UserId) -> Club:
         )
 
     return club_created
+
+async def sql_get_club_by_club_id(club_id: ClubId) -> Club | None:
+    query = """
+        SELECT clubs.* FROM clubs
+        WHERE id = :club_id
+        """
+    result = await database.fetch_one(query=query, values={"club_id": club_id})
+    return Club.model_validate(result) if result is not None else None
 
 
 async def sql_update_club(club_id: ClubId, club: ClubUpdateBody) -> Club | None:

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from sqlalchemy.sql.sqltypes import BigInteger, Boolean, DateTime, Enum, Float, Text
+from uuid import UUID
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -9,7 +10,7 @@ DateTimeTZ = DateTime(timezone=True)
 clubs = Table(
     "clubs",
     metadata,
-    Column("id", BigInteger, primary_key=True, index=True, autoincrement=True),
+    Column("id", String, primary_key=True, index=True),
     Column("name", String, nullable=False, index=True),
     Column("created", DateTimeTZ, nullable=False),
 )
@@ -21,7 +22,7 @@ tournaments = Table(
     Column("name", String, nullable=False, index=True),
     Column("created", DateTimeTZ, nullable=False, server_default="now()"),
     Column("start_time", DateTimeTZ, nullable=False),
-    Column("club_id", BigInteger, ForeignKey("clubs.id"), index=True, nullable=False),
+    Column("club_id", String, ForeignKey("clubs.id"), index=True, nullable=False),
     Column("dashboard_public", Boolean, nullable=False),
     Column("logo_path", String, nullable=True),
     Column("dashboard_endpoint", String, nullable=True, index=True, unique=True),
@@ -155,6 +156,7 @@ users = Table(
     "users",
     metadata,
     Column("id", BigInteger, primary_key=True, index=True),
+    Column("uuid", String, nullable=True, index=True, unique=True),
     Column("email", String, nullable=False, index=True, unique=True),
     Column("name", String, nullable=False),
     Column("password_hash", String, nullable=False),
@@ -174,7 +176,7 @@ users_x_clubs = Table(
     "users_x_clubs",
     metadata,
     Column("id", BigInteger, primary_key=True, index=True),
-    Column("club_id", BigInteger, ForeignKey("clubs.id", ondelete="CASCADE"), nullable=False),
+    Column("club_id", String, ForeignKey("clubs.id", ondelete="CASCADE"), nullable=False),
     Column("user_id", BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
     Column(
         "relation",

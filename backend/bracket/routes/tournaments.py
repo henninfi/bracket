@@ -6,6 +6,7 @@ import asyncpg  # type: ignore[import-untyped]
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from heliclockter import datetime_utc
 from starlette import status
+from propelauth_fastapi import User as User_propelauth
 
 from bracket.database import database
 from bracket.logic.planning.matches import update_start_times_of_matches
@@ -17,13 +18,9 @@ from bracket.models.db.tournament import (
     TournamentUpdateBody,
 )
 from bracket.models.db.user import UserPublic
-from bracket.routes.auth import (
-    user_authenticated,
-    user_authenticated_for_tournament,
-    user_authenticated_or_public_dashboard,
-    user_authenticated_or_public_dashboard_by_endpoint_name,
-)
+from bracket.routes.auth import auth
 from bracket.routes.models import SuccessResponse, TournamentResponse, TournamentsResponse
+from bracket.routes.users import get_user_by_id
 from bracket.schema import tournaments
 from bracket.sql.tournaments import (
     sql_delete_tournament,
@@ -33,6 +30,7 @@ from bracket.sql.tournaments import (
     sql_update_tournament,
 )
 from bracket.sql.users import get_user_access_to_club, get_which_clubs_has_user_access_to
+
 from bracket.utils.errors import (
     ForeignKey,
     UniqueIndex,
@@ -43,6 +41,9 @@ from bracket.utils.id_types import TournamentId
 from bracket.utils.logging import logger
 from bracket.utils.types import assert_some
 
+
+
+
 router = APIRouter()
 unauthorized_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -51,24 +52,26 @@ unauthorized_exception = HTTPException(
 )
 
 
-@router.get("/tournaments/{tournament_id}", response_model=TournamentResponse)
+@router.get("/tournaments/{tournament_id}", tags = ["tournaments"], response_model=TournamentResponse)
 async def get_tournament(
     tournament_id: TournamentId,
-    user: UserPublic | None = Depends(user_authenticated_or_public_dashboard),
+    user: User_propelauth | None = Depends(auth.require_user),
 ) -> TournamentResponse:
+    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     tournament = await sql_get_tournament(tournament_id)
-    if user is None and not tournament.dashboard_public:
+    if bracket_user is None and not tournament.dashboard_public:
         raise unauthorized_exception
 
     return TournamentResponse(data=tournament)
 
 
-@router.get("/tournaments", response_model=TournamentsResponse)
+@router.get("/tournaments", tags = ["tournaments"], response_model=TournamentsResponse)
 async def get_tournaments(
-    user: UserPublic | None = Depends(user_authenticated_or_public_dashboard_by_endpoint_name),
+    user: User_propelauth | None = Depends(auth.require_user),
     endpoint_name: str | None = None,
 ) -> TournamentsResponse:
-    match user, endpoint_name:
+    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    match bracket_user, endpoint_name:
         case None, None:
             raise unauthorized_exception
 
@@ -82,8 +85,8 @@ async def get_tournaments(
                 )
             return TournamentsResponse(data=[tournament])
 
-        case _, _ if isinstance(user, UserPublic):
-            user_club_ids = await get_which_clubs_has_user_access_to(assert_some(user.id))
+        case _, _ if isinstance(bracket_user, UserPublic):
+            user_club_ids = await get_which_clubs_has_user_access_to(assert_some(bracket_user.id))
             return TournamentsResponse(
                 data=await sql_get_tournaments(tuple(user_club_ids), endpoint_name)
             )
@@ -91,11 +94,11 @@ async def get_tournaments(
     raise RuntimeError()
 
 
-@router.put("/tournaments/{tournament_id}", response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}", tags = ["tournaments"], response_model=SuccessResponse)
 async def update_tournament_by_id(
     tournament_id: TournamentId,
     tournament_body: TournamentUpdateBody,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
     try:
         await sql_update_tournament(tournament_id, tournament_body)
@@ -106,9 +109,9 @@ async def update_tournament_by_id(
     return SuccessResponse()
 
 
-@router.delete("/tournaments/{tournament_id}", response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}", tags = ["tournaments"], response_model=SuccessResponse)
 async def delete_tournament(
-    tournament_id: TournamentId, _: UserPublic = Depends(user_authenticated_for_tournament)
+    tournament_id: TournamentId, _: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
     with check_foreign_key_violation({ForeignKey.stages_tournament_id_fkey}):
         await sql_delete_tournament(tournament_id)
@@ -116,15 +119,16 @@ async def delete_tournament(
     return SuccessResponse()
 
 
-@router.post("/tournaments", response_model=SuccessResponse)
+@router.post("/tournaments", tags = ["tournaments"], response_model=SuccessResponse)
 async def create_tournament(
-    tournament_to_insert: TournamentBody, user: UserPublic = Depends(user_authenticated)
+    tournament_to_insert: TournamentBody, user: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
+    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     existing_tournaments = await sql_get_tournaments((tournament_to_insert.club_id,))
-    check_requirement(existing_tournaments, user, "max_tournaments")
+    check_requirement(existing_tournaments, bracket_user, "max_tournaments")
 
     has_access_to_club = await get_user_access_to_club(
-        tournament_to_insert.club_id, assert_some(user.id)
+        tournament_to_insert.club_id, assert_some(bracket_user.id)
     )
     if not has_access_to_club:
         raise HTTPException(
@@ -151,7 +155,7 @@ async def create_tournament(
 async def upload_logo(
     tournament_id: TournamentId,
     file: UploadFile | None = None,
-    _: UserPublic = Depends(user_authenticated_for_tournament),
+    _: UserPublic = Depends(auth.require_user),
 ) -> TournamentResponse:
     old_logo_path = await get_tournament_logo_path(tournament_id)
     filename: str | None = None
