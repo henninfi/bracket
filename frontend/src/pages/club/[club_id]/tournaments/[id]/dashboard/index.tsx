@@ -4,19 +4,19 @@ import Head from 'next/head';
 import React, { useState } from 'react';
 import { SWRResponse } from 'swr';
 
-import NotFoundTitle from '../../../404';
-import Brackets from '../../../../components/brackets/brackets';
+import NotFoundTitle from '../../../../../404';
+import Brackets from '../../../../../../components/brackets/brackets';
 import {
   TournamentHeadTitle,
   TournamentLogo,
   TournamentTitle,
-} from '../../../../components/dashboard/layout';
-import StagesTab from '../../../../components/utils/stages_tab';
-import { responseIsValid } from '../../../../components/utils/util';
-import { BracketDisplaySettings } from '../../../../interfaces/brackets';
-import { StageWithStageItems } from '../../../../interfaces/stage';
-import { getStagesLive } from '../../../../services/adapter';
-import { getTournamentResponseByEndpointName } from '../../../../services/tournament';
+} from '../../../../../../components/dashboard/layout';
+import StagesTab from '../../../../../../components/utils/stages_tab';
+import { responseIsValid } from '../../../../../../components/utils/util';
+import { BracketDisplaySettings } from '../../../../../../interfaces/brackets';
+import { StageWithStageItems } from '../../../../../../interfaces/stage';
+import { getStagesLive } from '../../../../../../services/adapter';
+import { getTournamentResponseByEndpointName } from '../../../../../../services/tournament';
 
 export default function Index() {
   const tournamentResponse = getTournamentResponseByEndpointName();

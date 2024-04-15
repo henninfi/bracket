@@ -4,17 +4,17 @@ import Head from 'next/head';
 import React from 'react';
 import { SWRResponse } from 'swr';
 
-import NotFoundTitle from '../../../404';
+import NotFoundTitle from '../../../../../404';
 import {
   TournamentHeadTitle,
   TournamentLogo,
   TournamentQRCode,
   TournamentTitle,
-} from '../../../../components/dashboard/layout';
-import StandingsTable from '../../../../components/tables/standings';
-import { TableSkeletonTwoColumns } from '../../../../components/utils/skeletons';
-import { getTeamsLive } from '../../../../services/adapter';
-import { getTournamentResponseByEndpointName } from '../../../../services/tournament';
+} from '../../../../../../components/dashboard/layout';
+import StandingsTable from '../../../../../../components/tables/standings';
+import { TableSkeletonTwoColumns } from '../../../../../../components/utils/skeletons';
+import { getTeamsLive } from '../../../../../../services/adapter';
+import { getTournamentResponseByEndpointName } from '../../../../../../services/tournament';
 
 export default function Standings() {
   const tournamentResponse = getTournamentResponseByEndpointName();

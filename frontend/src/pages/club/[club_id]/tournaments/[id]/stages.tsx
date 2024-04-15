@@ -3,17 +3,17 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
 
-import Builder from '../../../components/builder/builder';
-import { CreateStageButtonLarge } from '../../../components/buttons/create_stage';
+import Builder from '../../../../../components/builder/builder';
+import { CreateStageButtonLarge } from '../../../../../components/buttons/create_stage';
 import {
   NextStageButton,
   PreviousStageButton,
-} from '../../../components/buttons/next_stage_button';
-import { NoContent } from '../../../components/no_content/empty_table_info';
-import { TableSkeletonTwoColumnsSmall } from '../../../components/utils/skeletons';
-import { getTournamentIdFromRouter } from '../../../components/utils/util';
-import { StageWithStageItems } from '../../../interfaces/stage';
-import { getStages, getTournamentById } from '../../../services/adapter';
+} from '../../../../../components/buttons/next_stage_button';
+import { NoContent } from '../../../../../components/no_content/empty_table_info';
+import { TableSkeletonTwoColumnsSmall } from '../../../../../components/utils/skeletons';
+import { getTournamentIdFromRouter } from '../../../../../components/utils/util';
+import { StageWithStageItems } from '../../../../../interfaces/stage';
+import { getStages, getTournamentById } from '../../../../../services/adapter';
 import TournamentLayout from '../_tournament_layout';
 
 export default function StagesPage() {

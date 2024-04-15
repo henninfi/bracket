@@ -39,7 +39,7 @@ export default function TournamentsTable({
     .map((tournament) => (
       <Table.Tr key={tournament.id}>
         <Table.Td>
-          <Link href={`/tournaments/${tournament.id}`}>{tournament.name}</Link>
+          <Link href={`/club/${tournament.club_id}/tournaments/${tournament.id}`}>{tournament.name}</Link>
         </Table.Td>
         <Table.Td>
           <DateTime datetime={tournament.created} />
@@ -49,7 +49,7 @@ export default function TournamentsTable({
             color="green"
             size="xs"
             style={{ marginRight: 10 }}
-            onClick={() => router.push(`/tournaments/${tournament.id}/settings`)}
+            onClick={() => router.push(`/club/${tournament.club_id}/tournaments/${tournament.id}/settings`)}
             leftSection={<BiEditAlt size={20} />}
           >
             {t('edit_tournament_button')}

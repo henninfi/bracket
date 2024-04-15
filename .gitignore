@@ -20,3 +20,4 @@ backend/static
 backend/venv
 
 frontend/src/client
+backend/bracket/routes/auth.py

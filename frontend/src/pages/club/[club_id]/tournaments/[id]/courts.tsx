@@ -5,12 +5,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
 import { SWRResponse } from 'swr';
 
-import CourtsTable from '../../../components/tables/courts';
-import { Translator } from '../../../components/utils/types';
-import { getTournamentIdFromRouter } from '../../../components/utils/util';
-import { Tournament } from '../../../interfaces/tournament';
-import { getCourts, getTournamentById } from '../../../services/adapter';
-import { createCourt } from '../../../services/court';
+import CourtsTable from '../../../../../components/tables/courts';
+import { Translator } from '../../../../../components/utils/types';
+import { getTournamentIdFromRouter } from '../../../../../components/utils/util';
+import { Tournament } from '../../../../../interfaces/tournament';
+import { getCourts, getTournamentById } from '../../../../../services/adapter';
+import { createCourt } from '../../../../../services/court';
 import TournamentLayout from '../_tournament_layout';
 
 function CreateCourtForm(t: Translator, tournament: Tournament, swrCourtsResponse: SWRResponse) {

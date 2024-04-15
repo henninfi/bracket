@@ -5,21 +5,21 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
 
-import { NoContent } from '../../../components/no_content/empty_table_info';
-import { Time } from '../../../components/utils/datetime';
-import { Translator } from '../../../components/utils/types';
-import { getTournamentIdFromRouter, responseIsValid } from '../../../components/utils/util';
-import { Court } from '../../../interfaces/court';
-import { MatchInterface, formatMatchTeam1, formatMatchTeam2 } from '../../../interfaces/match';
-import { getCourts, getStages } from '../../../services/adapter';
+import { NoContent } from '../../../../../components/no_content/empty_table_info';
+import { Time } from '../../../../../components/utils/datetime';
+import { Translator } from '../../../../../components/utils/types';
+import { getTournamentIdFromRouter, responseIsValid } from '../../../../../components/utils/util';
+import { Court } from '../../../../../interfaces/court';
+import { MatchInterface, formatMatchTeam1, formatMatchTeam2 } from '../../../../../interfaces/match';
+import { getCourts, getStages } from '../../../../../services/adapter';
 import {
   getMatchLookup,
   getMatchLookupByCourt,
   getScheduleData,
   getStageItemLookup,
   stringToColour,
-} from '../../../services/lookups';
-import { rescheduleMatch, scheduleMatches } from '../../../services/match';
+} from '../../../../../services/lookups';
+import { rescheduleMatch, scheduleMatches } from '../../../../../services/match';
 import TournamentLayout from '../_tournament_layout';
 
 function ScheduleRow({

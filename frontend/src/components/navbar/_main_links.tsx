@@ -122,10 +122,10 @@ export function getBaseLinks() {
     ));
 }
 
-export function TournamentLinks({ tournament_id }: any) {
+export function TournamentLinks({ club_id, tournament_id }: any) {
   const router = useRouter();
   const { t } = useTranslation();
-  const tm_prefix = `/tournaments/${tournament_id}`;
+  const tm_prefix = `/club/${club_id}/tournaments/${tournament_id}`;
   const pathName = router.pathname.replace('[id]', tournament_id).replace(/\/+$/, '');
 
   const data = [

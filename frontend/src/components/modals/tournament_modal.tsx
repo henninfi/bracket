@@ -22,6 +22,7 @@ import { Tournament } from '../../interfaces/tournament';
 import { getBaseApiUrl, getClubs } from '../../services/adapter';
 import { createTournament } from '../../services/tournament';
 import SaveButton from '../buttons/save';
+import { useRouter } from 'next/router'
 
 export function TournamentLogo({ tournament }: { tournament: Tournament | null }) {
   if (tournament == null || tournament.logo_path == null) return null;
@@ -40,11 +41,13 @@ function GeneralTournamentForm({
   clubs: Club[];
 }) {
   const { t } = useTranslation();
+  const router = useRouter()
+  console.log('router.query.club_id', router.query.club_id)
   const form = useForm({
     initialValues: {
       start_time: new Date(),
       name: '',
-      club_id: null,
+      club_id: router.query.club_id,
       dashboard_public: true,
       dashboard_endpoint: '',
       players_can_be_in_multiple_teams: false,
@@ -69,7 +72,7 @@ function GeneralTournamentForm({
       onSubmit={form.onSubmit(async (values) => {
         assert(values.club_id != null);
         await createTournament(
-          values.club_id,
+          values.club_id as string,
           values.name,
           values.dashboard_public,
           values.dashboard_endpoint,

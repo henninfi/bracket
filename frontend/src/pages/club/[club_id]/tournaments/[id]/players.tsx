@@ -3,11 +3,11 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
 
-import PlayerCreateModal from '../../../components/modals/player_create_modal';
-import PlayersTable from '../../../components/tables/players';
-import { getTableState, tableStateToPagination } from '../../../components/tables/table';
-import { capitalize, getTournamentIdFromRouter } from '../../../components/utils/util';
-import { getPlayersPaginated } from '../../../services/adapter';
+import PlayerCreateModal from '../../../../../components/modals/player_create_modal';
+import PlayersTable from '../../../../../components/tables/players';
+import { getTableState, tableStateToPagination } from '../../../../../components/tables/table';
+import { capitalize, getTournamentIdFromRouter } from '../../../../../components/utils/util';
+import { getPlayersPaginated } from '../../../../../services/adapter';
 import TournamentLayout from '../_tournament_layout';
 
 export default function Players() {

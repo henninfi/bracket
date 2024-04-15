@@ -21,19 +21,19 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
 import { SWRResponse } from 'swr';
 
-import NotFoundTitle from '../../404';
-import { DropzoneButton } from '../../../components/utils/file_upload';
-import { GenericSkeleton } from '../../../components/utils/skeletons';
-import { capitalize, getBaseURL, getTournamentIdFromRouter } from '../../../components/utils/util';
-import { Club } from '../../../interfaces/club';
-import { Tournament, getTournamentEndpoint } from '../../../interfaces/tournament';
+import NotFoundTitle from '../../../../404';
+import { DropzoneButton } from '../../../../../components/utils/file_upload';
+import { GenericSkeleton } from '../../../../../components/utils/skeletons';
+import { capitalize, getBaseURL, getTournamentIdFromRouter } from '../../../../../components/utils/util';
+import { Club } from '../../../../../interfaces/club';
+import { Tournament, getTournamentEndpoint } from '../../../../../interfaces/tournament';
 import {
   getBaseApiUrl,
   getClubs,
   getTournamentById,
   removeTournamentLogo,
-} from '../../../services/adapter';
-import { updateTournament } from '../../../services/tournament';
+} from '../../../../../services/adapter';
+import { updateTournament } from '../../../../../services/tournament';
 import TournamentLayout from '../_tournament_layout';
 
 export function TournamentLogo({ tournament }: { tournament: Tournament | null }) {
@@ -105,7 +105,7 @@ function GeneralTournamentForm({
         {...form.getInputProps('name')}
       />
 
-      <Select
+      {/* <Select
         withAsterisk
         data={clubs.map((p) => ({ value: `${p.id}`, label: p.name }))}
         label={capitalize(t('clubs_title'))}
@@ -114,7 +114,7 @@ function GeneralTournamentForm({
         limit={20}
         mt="lg"
         {...form.getInputProps('club_id')}
-      />
+      /> */}
 
       <Fieldset legend={t('planning_of_matches_legend')} mt="lg" radius="md">
         <Text fz="sm">{t('planning_of_matches_description')}</Text>
