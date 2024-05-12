@@ -56,6 +56,7 @@ export default function TournamentsTable({
           </Button>
           <DeleteButton
             onClick={async () => {
+              console.log('delete tournament', tournament.id.toString(), typeof tournament.id.toString());
               await deleteTournament(tournament.id);
               await swrTournamentsResponse.mutate();
             }}

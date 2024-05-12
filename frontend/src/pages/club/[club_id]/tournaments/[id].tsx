@@ -4,6 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useState } from 'react';
 import { SWRResponse } from 'swr';
+import { useRouter } from 'next/router';
 
 import NotFoundTitle from '../../../404';
 import Brackets from '../../../../components/brackets/brackets';
@@ -11,7 +12,7 @@ import Scheduler from '../../../../components/scheduling/scheduling';
 import classes from '../../../../components/utility.module.css';
 import { useRouterQueryState } from '../../../../components/utils/query_parameters';
 import StagesTab from '../../../../components/utils/stages_tab';
-import { getTournamentIdFromRouter, responseIsValid } from '../../../../components/utils/util';
+import { getTournamentIdFromRouter, responseIsValid, getClubIdFromRouter } from '../../../../components/utils/util';
 import { BracketDisplaySettings } from '../../../../interfaces/brackets';
 import { SchedulerSettings } from '../../../../interfaces/match';
 import { RoundInterface } from '../../../../interfaces/round';
@@ -34,7 +35,9 @@ export const getServerSideProps = async ({ locale }: { locale: string }) => ({
 
 export default function TournamentPage() {
   const { id, tournamentData } = getTournamentIdFromRouter();
+  const club_id = getClubIdFromRouter();
   const { t } = useTranslation();
+  const router = useRouter();
 
   const swrTournamentResponse = getTournamentById(tournamentData.id);
   // checkForAuthError(swrTournamentResponse);
@@ -155,7 +158,8 @@ export default function TournamentPage() {
               leftSection={<IconExternalLink size={24} />}
               onClick={() => {
                 const endpoint = getTournamentEndpoint(tournamentDataFull);
-                window.open(`/tournaments/${endpoint}/dashboard`, '_ blank');
+                router.push(`/club/${club_id}/tournaments/${endpoint}/dashboard`);
+                // window.open(`/club/${club_id}/tournaments/${endpoint}/dashboard`, '_ blank');
               }}
             >
               {t('view_dashboard_button')}

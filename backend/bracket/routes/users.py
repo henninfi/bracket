@@ -31,13 +31,13 @@ from bracket.utils.types import assert_some
 router = APIRouter()
 
 
-@router.get("/users/me", tags = ["users"], response_model=UserPublicResponse)
+@router.get("/users/me", tags = ["Users"], response_model=UserPublicResponse)
 async def get_user(user: User_propelauth = Depends(auth.require_user)) -> UserPublicResponse:
     user_public = await get_user_by_id(assert_some(user.properties['bracket_id']))
     return UserPublicResponse(data=user_public)
 
 
-@router.get("/users/{user_id}", tags = ["users"], response_model=UserPublicResponse)
+@router.get("/users/{user_id}", tags = ["Users"], response_model=UserPublicResponse)
 async def get_me(
     user_id: UserId, user: User_propelauth = Depends(auth.require_user)
 ) -> UserPublicResponse:
@@ -48,7 +48,7 @@ async def get_me(
     return UserPublicResponse(data=user_public)
 
 
-@router.put("/users/{user_id}", tags = ["users"], response_model=UserPublicResponse)
+@router.put("/users/{user_id}", tags = ["Users"], response_model=UserPublicResponse)
 async def update_user_details(
     user_id: UserId,
     user_to_update: UserToUpdate,
@@ -63,7 +63,7 @@ async def update_user_details(
     return UserPublicResponse(data=assert_some(user_updated))
 
 
-@router.put("/users/{user_id}/password", tags = ["users"], response_model=SuccessResponse)
+@router.put("/users/{user_id}/password", tags = ["Users"], response_model=SuccessResponse)
 async def put_user_password(
     user_id: UserId,
     user_to_update: UserPasswordToUpdate,
@@ -75,7 +75,7 @@ async def put_user_password(
     return SuccessResponse()
 
 
-@router.post("/users/register", tags = ["users"])
+@router.post("/users/register", tags = ["Users"])
 async def register_user(user_to_register: UserToRegister, ):
     if not config.allow_user_registration:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Account creation is unavailable for now")
@@ -98,7 +98,7 @@ async def register_user(user_to_register: UserToRegister, ):
     return user_created.id
 
 
-@router.post("/users/register_demo", tags = ["users"])
+@router.post("/users/register_demo", tags = ["Users"])
 async def register_demo_user(user_to_register: DemoUserToRegister):
     if not config.allow_demo_user_registration:
         raise HTTPException(

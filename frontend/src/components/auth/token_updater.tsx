@@ -7,12 +7,13 @@ const AuthTokenUpdater = () => {
     const authInfo = useAuthInfo();
 
     // Check if the API URL is defined
-    if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
+    if (!process.env.NEXT_PUBLIC_API_RANKIT_URL) {
         throw new Error("API URL is not defined");
       }
-    OpenAPI.BASE = process.env.NEXT_PUBLIC_API_BASE_URL as string;
+    
     
     useEffect(() => {
+        OpenAPI.BASE = process.env.NEXT_PUBLIC_API_RANKIT_URL as string;
         // Update the OpenAPI configuration with the new token
         // OpenAPI.TOKEN = authInfo.accessToken ? `Bearer ${authInfo.accessToken}` : '';
         

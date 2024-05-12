@@ -2,11 +2,13 @@ import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse, Response
+from starlette.requests import Request
+from starlette.status import HTTP_429_TOO_MANY_REQUESTS
 from starlette.staticfiles import StaticFiles
 
 from bracket.config import Environment, config, environment, init_sentry
@@ -30,6 +32,11 @@ from bracket.utils.alembic import alembic_run_migrations
 from bracket.utils.asyncio import AsyncioTasksManager
 from bracket.utils.db_init import init_db_when_empty
 from bracket.utils.logging import logger
+from bracket.utils.limits_wrapper import RateLimitMiddleware
+from bracket.utils.limits_wrapper import rate_provider
+
+
+
 
 init_sentry()
 
@@ -63,7 +70,7 @@ routers = {
     "Matches": matches.router,
     "Players": players.router,
     "Rounds": rounds.router,
-    "Stage Items": stage_items.router,
+    "Stage_items": stage_items.router,
     "Stages": stages.router,
     "Teams": teams.router,
     "Tournaments": tournaments.router,
@@ -99,6 +106,8 @@ API docs (Redoc): <https://api.bracketapp.nl/redoc>
 API docs (Swagger UI): <https://api.bracketapp.nl/docs>
 """
 
+
+
 app = FastAPI(
     title="Bracket API",
     docs_url="/docs",
@@ -110,6 +119,7 @@ app = FastAPI(
         "name": "AGPL-3.0",
         "url": "https://www.gnu.org/licenses/agpl-3.0.en.html",
     },
+    dependencies=[Depends(RateLimitMiddleware(rate_provider=rate_provider))]
 )
 
 app.add_middleware(
@@ -122,6 +132,8 @@ app.add_middleware(
 )
 
 
+
+
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next: RequestResponseEndpoint) -> Response:
     start_time = time.time()
@@ -131,6 +143,11 @@ async def add_process_time_header(request: Request, call_next: RequestResponseEn
     process_time = time.time() - start_time
     request_metrics.response_time[RequestDefinition.from_request(request)] = process_time
     return response
+
+# # Define the rate-limiting middleware
+# @app.middleware("http")
+# async def rate_limit_middleware(request: Request, call_next: RequestResponseEndpoint) -> Response:
+#     return await rate_limit(request)
 
 
 @app.exception_handler(HTTPException)

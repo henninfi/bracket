@@ -20,7 +20,7 @@ from bracket.utils.types import assert_some
 router = APIRouter()
 
 
-@router.get("/tournaments/{tournament_id}/courts", tags=["courts"], response_model=CourtsResponse)
+@router.get("/tournaments/{tournament_id}/courts", tags=["Courts"], response_model=CourtsResponse)
 async def get_courts(
     tournament_id: TournamentId,
     _: User_propelauth = Depends(auth.require_user),
@@ -28,7 +28,7 @@ async def get_courts(
     return CourtsResponse(data=await get_all_courts_in_tournament(tournament_id))
 
 
-@router.put("/tournaments/{tournament_id}/courts/{court_id}", tags=["courts"], response_model=SingleCourtResponse)
+@router.put("/tournaments/{tournament_id}/courts/{court_id}", tags=["Courts"], response_model=SingleCourtResponse)
 async def update_court_by_id(
     tournament_id: TournamentId,
     court_id: CourtId,
@@ -53,7 +53,7 @@ async def update_court_by_id(
     )
 
 
-@router.delete("/tournaments/{tournament_id}/courts/{court_id}", tags=["courts"], response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/courts/{court_id}", tags=["Courts"], response_model=SuccessResponse)
 async def delete_court(
     tournament_id: TournamentId,
     court_id: CourtId,
@@ -78,7 +78,7 @@ async def delete_court(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/courts", tags=["courts"], response_model=SingleCourtResponse)
+@router.post("/tournaments/{tournament_id}/courts", tags=["Courts"], response_model=SingleCourtResponse)
 async def create_court(
     court_body: CourtBody,
     tournament_id: TournamentId,

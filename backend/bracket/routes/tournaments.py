@@ -52,7 +52,7 @@ unauthorized_exception = HTTPException(
 )
 
 
-@router.get("/tournaments/{tournament_id}", tags = ["tournaments"], response_model=TournamentResponse)
+@router.get("/tournaments/{tournament_id}", tags = ["Tournaments"], response_model=TournamentResponse)
 async def get_tournament(
     tournament_id: TournamentId,
     user: User_propelauth | None = Depends(auth.require_user),
@@ -65,7 +65,7 @@ async def get_tournament(
     return TournamentResponse(data=tournament)
 
 
-@router.get("/tournaments", tags = ["tournaments"], response_model=TournamentsResponse)
+@router.get("/tournaments", tags = ["Tournaments"], response_model=TournamentsResponse)
 async def get_tournaments(
     user: User_propelauth | None = Depends(auth.require_user),
     endpoint_name: str | None = None,
@@ -94,7 +94,7 @@ async def get_tournaments(
     raise RuntimeError()
 
 
-@router.put("/tournaments/{tournament_id}", tags = ["tournaments"], response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}", tags = ["Tournaments"], response_model=SuccessResponse)
 async def update_tournament_by_id(
     tournament_id: TournamentId,
     tournament_body: TournamentUpdateBody,
@@ -109,7 +109,7 @@ async def update_tournament_by_id(
     return SuccessResponse()
 
 
-@router.delete("/tournaments/{tournament_id}", tags = ["tournaments"], response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}", tags = ["Tournaments"], response_model=SuccessResponse)
 async def delete_tournament(
     tournament_id: TournamentId, _: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
@@ -119,7 +119,7 @@ async def delete_tournament(
     return SuccessResponse()
 
 
-@router.post("/tournaments", tags = ["tournaments"], response_model=SuccessResponse)
+@router.post("/tournaments", tags = ["Tournaments"], response_model=SuccessResponse)
 async def create_tournament(
     tournament_to_insert: TournamentBody, user: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
@@ -146,7 +146,8 @@ async def create_tournament(
             ).model_dump(),
         )
     except asyncpg.exceptions.UniqueViolationError as exc:
-        check_unique_constraint_violation(exc, {UniqueIndex.ix_tournaments_dashboard_endpoint})
+        # check_unique_constraint_violation(exc, {UniqueIndex.ix_tournaments_dashboard_endpoint})
+        pass
 
     return SuccessResponse()
 

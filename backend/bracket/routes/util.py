@@ -118,3 +118,4 @@ async def team_with_players_dependency(
         )
 
     return teams_with_members[0]
+

@@ -3,6 +3,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import { SWRResponse } from 'swr';
+import { useAuthInfo } from '@propelauth/react';
 
 import NotFoundTitle from '../../../../../404';
 import Brackets from '../../../../../../components/brackets/brackets';
@@ -20,6 +21,7 @@ import { getTournamentResponseByEndpointName } from '../../../../../../services/
 
 export default function Index() {
   const tournamentResponse = getTournamentResponseByEndpointName();
+  const authInfo = useAuthInfo();
 
   // Hack to avoid unequal number of rendered hooks.
   const notFound = tournamentResponse == null || tournamentResponse[0] == null;

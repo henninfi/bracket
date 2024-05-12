@@ -24,15 +24,18 @@ from bracket.utils.types import assert_some
 from propelauth_fastapi import init_auth
 
 
+
 router = APIRouter()
 
+if os.getenv('ENVIRONMENT') == 'PRODUCTION':
+    # Load environment variables from .env file
+    load_dotenv('prod_backend.env')
 # Load environment variables from .env file
-load_dotenv('dev_backend.env')
+else: 
+    load_dotenv('dev_backend.env')
 
 # Accessing variables
 PROP_AUTH_URL = os.getenv('PROP_AUTH_URL')
 PROP_AUTH_SECRET = os.getenv('PROP_AUTH_SECRET')
-
-print(PROP_AUTH_URL)
 
 auth = init_auth(PROP_AUTH_URL, PROP_AUTH_SECRET)

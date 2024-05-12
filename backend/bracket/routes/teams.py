@@ -63,7 +63,7 @@ async def update_team_members(
     await recalculate_ranking_for_tournament_id(tournament_id)
 
 
-@router.get("/tournaments/{tournament_id}/teams", tags = ["teams"], response_model=TeamsWithPlayersResponse)
+@router.get("/tournaments/{tournament_id}/teams", tags = ["Teams"], response_model=TeamsWithPlayersResponse)
 async def get_teams(
     tournament_id: TournamentId,
     pagination: PaginationTeams = Depends(),
@@ -77,7 +77,7 @@ async def get_teams(
     )
 
 
-@router.put("/tournaments/{tournament_id}/teams/{team_id}", tags = ["teams"], response_model=SingleTeamResponse)
+@router.put("/tournaments/{tournament_id}/teams/{team_id}", tags = ["Teams"], response_model=SingleTeamResponse)
 async def update_team_by_id(
     tournament_id: TournamentId,
     team_body: TeamBody,
@@ -108,7 +108,7 @@ async def update_team_by_id(
     )
 
 
-@router.post("/tournaments/{tournament_id}/teams/{team_id}/logo", tags = ["teams"], response_model=SingleTeamResponse)
+@router.post("/tournaments/{tournament_id}/teams/{team_id}/logo", tags = ["Teams"], response_model=SingleTeamResponse)
 async def update_team_logo(
     tournament_id: TournamentId,
     file: UploadFile | None = None,
@@ -146,7 +146,7 @@ async def update_team_logo(
     return SingleTeamResponse(data=assert_some(await get_team_by_id(team_id, tournament_id)))
 
 
-@router.delete("/tournaments/{tournament_id}/teams/{team_id}", tags = ["teams"], response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/teams/{team_id}", tags = ["Teams"], response_model=SuccessResponse)
 async def delete_team(
     tournament_id: TournamentId,
     _: User_propelauth = Depends(auth.require_user),
@@ -165,7 +165,7 @@ async def delete_team(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/teams", tags = ["teams"], response_model=SingleTeamResponse)
+@router.post("/tournaments/{tournament_id}/teams", tags = ["Teams"], response_model=SingleTeamResponse)
 async def create_team(
     team_to_insert: TeamBody,
     tournament_id: TournamentId,
@@ -192,7 +192,7 @@ async def create_team(
     return SingleTeamResponse(data=team_result)
 
 
-@router.post("/tournaments/{tournament_id}/teams_multi", tags = ["teams"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/teams_multi", tags = ["Teams"], response_model=SuccessResponse)
 async def create_multiple_teams(
     team_body: TeamMultiBody,
     tournament_id: TournamentId,

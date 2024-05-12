@@ -32,7 +32,7 @@ from bracket.utils.types import assert_some
 router = APIRouter()
 
 
-@router.delete("/tournaments/{tournament_id}/rounds/{round_id}", tags = ["players"], response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/rounds/{round_id}", tags = ["Rounds"], response_model=SuccessResponse)
 async def delete_round(
     tournament_id: TournamentId,
     round_id: RoundId,
@@ -54,7 +54,7 @@ async def delete_round(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/rounds", tags = ["players"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/rounds", tags = ["Rounds"], response_model=SuccessResponse)
 async def create_round(
     tournament_id: TournamentId,
     round_body: RoundCreateBody,
@@ -97,7 +97,7 @@ async def create_round(
     return SuccessResponse()
 
 
-@router.put("/tournaments/{tournament_id}/rounds/{round_id}", tags = ["players"], response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}/rounds/{round_id}", tags = ["Rounds"], response_model=SuccessResponse)
 async def update_round_by_id(
     tournament_id: TournamentId,
     round_id: RoundId,

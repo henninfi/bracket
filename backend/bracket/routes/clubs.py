@@ -14,16 +14,16 @@ from propelauth_fastapi import User as User_propelauth
 
 router = APIRouter()
 
-@router.get("/club", tags=["clubs"], response_model=ClubResponse)
+@router.get("/club", tags=["Clubs"], response_model=ClubResponse)
 async def get_club_by_club_id(club_id: ClubId, user: User_propelauth = Depends(auth.require_user)) -> ClubsResponse:
     return ClubResponse(data=await sql_get_club_by_club_id(club_id))
 
-@router.get("/clubs", tags=["clubs"], response_model=ClubsResponse)
+@router.get("/clubs", tags=["Clubs"], response_model=ClubsResponse)
 async def get_clubs(user: User_propelauth = Depends(auth.require_user)) -> ClubsResponse:
     return ClubsResponse(data=await get_clubs_for_user_id(assert_some(user.properties['bracket_id'])))
 
 
-@router.post("/clubs", tags=["clubs"], response_model=ClubResponse)
+@router.post("/clubs", tags=["Clubs"], response_model=ClubResponse)
 async def create_new_club(
     club: ClubCreateBody, user: User_propelauth = Depends(auth.require_user)
 ) -> ClubResponse:
@@ -33,7 +33,7 @@ async def create_new_club(
     return ClubResponse(data=await create_club(club, assert_some(bracket_user.id)))
 
 
-@router.delete("/clubs/{club_id}", tags=["clubs"], response_model=SuccessResponse)
+@router.delete("/clubs/{club_id}", tags=["Clubs"], response_model=SuccessResponse)
 async def delete_club(
     club_id: ClubId, _: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
@@ -43,7 +43,7 @@ async def delete_club(
     return SuccessResponse()
 
 
-@router.put("/clubs/{club_id}", tags=["clubs"], response_model=ClubResponse)
+@router.put("/clubs/{club_id}", tags=["Clubs"], response_model=ClubResponse)
 async def update_club(
     club_id: ClubId, club: ClubUpdateBody, _: User_propelauth = Depends(auth.require_user)
 ) -> ClubResponse:

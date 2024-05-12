@@ -28,7 +28,7 @@ from bracket.utils.types import assert_some
 router = APIRouter()
 
 
-@router.get("/tournaments/{tournament_id}/players", tags = ["players"], response_model=PlayersResponse)
+@router.get("/tournaments/{tournament_id}/players", tags = ["Players"], response_model=PlayersResponse)
 async def get_players(
     tournament_id: TournamentId,
     not_in_team: bool = False,
@@ -45,7 +45,7 @@ async def get_players(
     )
 
 
-@router.put("/tournaments/{tournament_id}/players/{player_id}", tags = ["players"], response_model=SinglePlayerResponse)
+@router.put("/tournaments/{tournament_id}/players/{player_id}", tags = ["Players"], response_model=SinglePlayerResponse)
 async def update_player_by_id(
     tournament_id: TournamentId,
     player_id: PlayerId,
@@ -71,7 +71,7 @@ async def update_player_by_id(
     )
 
 
-@router.delete("/tournaments/{tournament_id}/players/{player_id}", tags = ["players"], response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/players/{player_id}", tags = ["Players"], response_model=SuccessResponse)
 async def delete_player(
     tournament_id: TournamentId,
     player_id: PlayerId,
@@ -81,7 +81,7 @@ async def delete_player(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/players", tags = ["players"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/players", tags = ["Players"], response_model=SuccessResponse)
 async def create_single_player(
     player_body: PlayerBody,
     tournament_id: TournamentId,
@@ -94,7 +94,7 @@ async def create_single_player(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/players_multi", tags = ["players"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/players_multi", tags = ["Players"], response_model=SuccessResponse)
 async def create_multiple_players(
     player_body: PlayerMultiBody,
     tournament_id: TournamentId,
@@ -106,6 +106,6 @@ async def create_multiple_players(
     check_requirement(existing_players, public_user, "max_players", additions=len(player_names))
 
     for player_name in player_names:
-        await insert_player(PlayerBody(name=player_name, active=player_body.active), tournament_id)
+        await insert_player(PlayerBody(name=player_name, active=True),  tournament_id)
 
     return SuccessResponse()

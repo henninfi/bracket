@@ -35,7 +35,7 @@ class Config(BaseSettings):
     captcha_secret: str | None = None
     base_url: str = "http://localhost:8400"
     cors_origin_regex: str = ""
-    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:3001"]
+    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:3001", "https://bracket.rankit.no"]
     jwt_secret: str
     auto_run_migrations: bool = True
     pg_dsn: PostgresDsn = "postgresql://default:qb0wRci3QsYX@ep-tight-bonus-209614-pooler.us-east-1.postgres.vercel-storage.com:5432/no-table-tennis-tournament-dev"  # type: ignore[assignment]

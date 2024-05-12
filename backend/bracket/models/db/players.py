@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel
 
-START_ELO: int = 1200
+START_ELO: int = 1500
 
 
 class PlayerStatistics(BaseModel):

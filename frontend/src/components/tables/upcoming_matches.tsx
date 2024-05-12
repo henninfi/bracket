@@ -73,8 +73,8 @@ export default function UpcomingMatchesTable({
         <td>
           <PlayerList team={upcoming_match.team2} displaySettings={displaySettings} />
         </td>
-        <td>{upcoming_match.elo_diff.toFixed(0)}</td>
-        <td>{upcoming_match.swiss_diff.toFixed(1)}</td>
+        <td>{Number(upcoming_match.elo_diff).toFixed(0)}</td>
+        <td>{Number(upcoming_match.swiss_diff).toFixed(1)}</td>
         <td>
           <Button
             color="green"

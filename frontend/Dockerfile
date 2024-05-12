@@ -1,50 +1,29 @@
-# Install dependencies only when needed
-FROM node:18-alpine AS deps
+# Step 1: Use an official Node.js runtime as a parent image
+FROM node:latest
 
-WORKDIR /app
+# Step 2: Set the working directory in the container
+WORKDIR /usr/src/app
 
-COPY package.json yarn.lock ./
+# Step 3: Copy the package.json and package-lock.json (or yarn.lock)
+# to leverage Docker cache layering
+COPY package*.json ./
 
-RUN yarn
+# Step 4: Install your application's dependencies
+RUN npm install --legacy-peer-deps
 
-# Rebuild the source code only when needed
-FROM node:18-alpine AS builder
-
-WORKDIR /app
-
+# Step 5: Copy the rest of your application's source code
 COPY . .
-COPY --from=deps /app/node_modules ./node_modules
 
-RUN NEXT_PUBLIC_API_BASE_URL="APP_PLACEHOLDER_NEXT_PUBLIC_API_BASE_URL" NEXT_PUBLIC_HCAPTCHA_SITE_KEY="APP_PLACEHOLDER_NEXT_PUBLIC_HCAPTCHA_SITE_KEY" yarn build
+# Step 6: Run npm update
+RUN npm update --legacy-peer-deps
 
-# Production image, copy all the files and run next
-FROM node:18-alpine AS runner
+# Step 7: Build your Next.js application
+# This step compiles your application and gets it ready for deployment
+RUN NEXT_PUBLIC_API_BASE_URL="https://bracket-api.rankit.no" npm run build
 
-WORKDIR /app
-
-ENV NODE_ENV production
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/docker-entrypoint.sh ./entrypoint.sh
-COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/next-i18next.config.js ./next-i18next.config.js
-
-RUN addgroup -g 1001 --system nodejs && \
-    adduser --system nextjs -u 1001 -G nodejs && \
-    chown -R nextjs:nodejs /app/.next && \
-    chmod +x /app/entrypoint.sh
-
-RUN apk add bash
-
-RUN yarn next telemetry disable
-
-USER nextjs
-
+# Step 8: Your app binds to port 3000 so you'll use the EXPOSE instruction
+# to have it mapped by the docker daemon. Adjust if your app uses a different port
 EXPOSE 3000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-CMD yarn start
+# Step 9: Define the command to run your app using CMD
+CMD ["npm", "run", "start"]

@@ -7,8 +7,6 @@ import ClubsTable from '../components/tables/clubs';
 import { capitalize } from '../components/utils/util';
 import { checkForAuthError, getClubs } from '../services/adapter';
 import Layout from './_layout';
-import { ClubsService } from '../client/services/ClubsService';
-import useSWR from 'swr';
 
 export default function HomePage() {
 

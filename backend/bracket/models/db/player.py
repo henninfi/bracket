@@ -36,7 +36,7 @@ class PlayerMultiBody(BaseModelORM):
 class PlayerToInsert(PlayerBody):
     created: datetime_utc
     tournament_id: TournamentId
-    elo_score: Decimal = Decimal("1200.0")
+    elo_score: Decimal = Decimal("1500.0")
     swiss_score: Decimal
     wins: int = 0
     draws: int = 0

@@ -61,8 +61,8 @@ export function createAxios() {
   // const user = getLogin();
   // const access_token = user != null ? user.access_token : '';
   return axios.create({
-    baseURL: OpenAPI.BASE, // Ensure your OpenAPI configuration object has a BASE_URL property
-    withCredentials: OpenAPI.WITH_CREDENTIALS,
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // Ensure your OpenAPI configuration object has a BASE_URL property
+    withCredentials: false,
     headers: {
       ...OpenAPI.HEADERS, // Spread existing headers from OpenAPI configuration
     },

@@ -29,7 +29,7 @@ export async function createTournament(
 
 export async function deleteTournament(tournament_id: number) {
   return createAxios()
-    .delete(`tournaments/${tournament_id}`)
+    .delete(`/tournaments/${tournament_id}`)
     .catch((response: any) => handleRequestError(response));
 }
 

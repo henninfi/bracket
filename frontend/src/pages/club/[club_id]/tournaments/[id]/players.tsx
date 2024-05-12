@@ -4,15 +4,18 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
 
 import PlayerCreateModal from '../../../../../components/modals/player_create_modal';
+import ImportPlayersModal from '../../../../../components/modals/player_create_from_league_modal';
 import PlayersTable from '../../../../../components/tables/players';
 import { getTableState, tableStateToPagination } from '../../../../../components/tables/table';
-import { capitalize, getTournamentIdFromRouter } from '../../../../../components/utils/util';
+import { capitalize, getTournamentIdFromRouter, getClubIdFromRouter } from '../../../../../components/utils/util';
 import { getPlayersPaginated } from '../../../../../services/adapter';
 import TournamentLayout from '../_tournament_layout';
 
 export default function Players() {
   const tableState = getTableState('name');
   const { tournamentData } = getTournamentIdFromRouter();
+  const club_id = getClubIdFromRouter();
+
   const swrPlayersResponse = getPlayersPaginated(
     tournamentData.id,
     tableStateToPagination(tableState)
@@ -30,7 +33,8 @@ export default function Players() {
             swrPlayersResponse={swrPlayersResponse}
             tournament_id={tournamentData.id}
           />
-          <PlayerCreateModal
+          <ImportPlayersModal
+            club_id={club_id}
             swrPlayersResponse={swrPlayersResponse}
             tournament_id={tournamentData.id}
           />

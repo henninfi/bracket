@@ -32,7 +32,7 @@ from bracket.utils.types import assert_some
 router = APIRouter()
 
 
-@router.get("/tournaments/{tournament_id}/stages", tags = ["stages"], response_model=StagesWithStageItemsResponse)
+@router.get("/tournaments/{tournament_id}/stages", tags = ["Stages"], response_model=StagesWithStageItemsResponse)
 async def get_stages(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
@@ -49,7 +49,7 @@ async def get_stages(
     return StagesWithStageItemsResponse(data=stages_)
 
 
-@router.delete("/tournaments/{tournament_id}/stages/{stage_id}", tags = ["stages"], response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/stages/{stage_id}", tags = ["Stages"], response_model=SuccessResponse)
 async def delete_stage(
     tournament_id: TournamentId,
     stage_id: StageId,
@@ -74,7 +74,7 @@ async def delete_stage(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/stages", tags = ["stages"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/stages", tags = ["Stages"], response_model=SuccessResponse)
 async def create_stage(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
@@ -87,7 +87,7 @@ async def create_stage(
     return SuccessResponse()
 
 
-@router.put("/tournaments/{tournament_id}/stages/{stage_id}", tags = ["stages"], response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}/stages/{stage_id}", tags = ["Stages"], response_model=SuccessResponse)
 async def update_stage(
     tournament_id: TournamentId,
     stage_id: StageId,
@@ -109,7 +109,7 @@ async def update_stage(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/stages/activate", tags = ["stages"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/stages/activate", tags = ["Stages"], response_model=SuccessResponse)
 async def activate_next_stage(
     tournament_id: TournamentId,
     stage_body: StageActivateBody,

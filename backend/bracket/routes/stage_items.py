@@ -39,7 +39,7 @@ router = APIRouter()
 
 
 @router.delete(
-    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", tags = ["stage_items"], response_model=SuccessResponse
+    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", tags = ["Stage_items"], response_model=SuccessResponse
 )
 async def delete_stage_item(
     tournament_id: TournamentId,
@@ -52,7 +52,7 @@ async def delete_stage_item(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/stage_items", tags = ["stage_items"], response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/stage_items", tags = ["Stage_items"], response_model=SuccessResponse)
 async def create_stage_item(
     tournament_id: TournamentId,
     stage_body: StageItemCreateBody,
@@ -77,7 +77,7 @@ async def create_stage_item(
 
 
 @router.put(
-    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", tags = ["stage_items"], response_model=SuccessResponse
+    "/tournaments/{tournament_id}/stage_items/{stage_item_id}", tags = ["Stage_items"], response_model=SuccessResponse
 )
 async def update_stage_item(
     tournament_id: TournamentId,
@@ -106,6 +106,7 @@ async def update_stage_item(
 
 @router.post(
     "/tournaments/{tournament_id}/stage_items/{stage_item_id}/start_next_round",
+    tags = ["Stage_items"],
     response_model=SuccessResponse,
 )
 async def start_next_round(

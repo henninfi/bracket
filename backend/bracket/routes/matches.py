@@ -36,7 +36,7 @@ router = APIRouter()
 
 @router.get(
     "/tournaments/{tournament_id}/rounds/{round_id}/upcoming_matches",
-    tags = ["matches"],
+    tags = ["Matches"],
     response_model=UpcomingMatchesResponse,
 )
 async def get_matches_to_schedule(
@@ -63,7 +63,7 @@ async def get_matches_to_schedule(
     )
 
 
-@router.delete("/tournaments/{tournament_id}/matches/{match_id}", response_model=SuccessResponse)
+@router.delete("/tournaments/{tournament_id}/matches/{match_id}", tags = ["Matches"], response_model=SuccessResponse)
 async def delete_match(
     tournament_id: TournamentId,
     _: User_propelauth = Depends(auth.require_user),
@@ -74,7 +74,7 @@ async def delete_match(
     return SuccessResponse()
 
 
-@router.post("/tournaments/{tournament_id}/matches", response_model=SingleMatchResponse)
+@router.post("/tournaments/{tournament_id}/matches", tags = ["Matches"], response_model=SingleMatchResponse)
 async def create_match(
     tournament_id: TournamentId,
     match_body: MatchCreateBodyFrontend,
@@ -92,7 +92,7 @@ async def create_match(
     return SingleMatchResponse(data=await sql_create_match(body_with_durations))
 
 
-@router.post("/tournaments/{tournament_id}/schedule_matches", response_model=SuccessResponse)
+@router.post("/tournaments/{tournament_id}/schedule_matches", tags = ["Matches"], response_model=SuccessResponse)
 async def schedule_matches(
     tournament_id: TournamentId,
     _: User_propelauth = Depends(auth.require_user),
@@ -102,7 +102,7 @@ async def schedule_matches(
 
 
 @router.post(
-    "/tournaments/{tournament_id}/matches/{match_id}/reschedule", response_model=SuccessResponse
+    "/tournaments/{tournament_id}/matches/{match_id}/reschedule", tags = ["Matches"], response_model=SuccessResponse
 )
 async def reschedule_match(
     tournament_id: TournamentId,
@@ -117,6 +117,7 @@ async def reschedule_match(
 
 @router.post(
     "/tournaments/{tournament_id}/rounds/{round_id}/schedule_auto",
+    tags = ["Matches"],
     response_model=SuccessResponse,
 )
 async def create_matches_automatically(
@@ -174,7 +175,7 @@ async def create_matches_automatically(
     return SuccessResponse()
 
 
-@router.put("/tournaments/{tournament_id}/matches/{match_id}", response_model=SuccessResponse)
+@router.put("/tournaments/{tournament_id}/matches/{match_id}", tags = ["Matches"], response_model=SuccessResponse)
 async def update_match_by_id(
     tournament_id: TournamentId,
     match_body: MatchBody,
