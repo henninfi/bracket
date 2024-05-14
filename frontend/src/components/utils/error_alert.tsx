@@ -1,6 +1,7 @@
 import { Alert } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
 import React from 'react';
+import { useAuthInfo } from '@propelauth/react';
 
 export function ErrorAlert({ title, message }: { title: string; message: string }) {
   return (
@@ -17,5 +18,5 @@ export default function RequestErrorAlert({ error }: any) {
       : 'Error';
   const message = `${status_code}: ${error.response ? error.response.data.detail : error.message}`;
 
-  return <ErrorAlert message={message} title="Error" />;
-}
+  return <ErrorAlert message={message} title="Error" />};
+

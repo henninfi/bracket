@@ -14,6 +14,7 @@ import { DateTime } from '../utils/datetime';
 import RequestErrorAlert from '../utils/error_alert';
 import { TableSkeletonSingleColumn } from '../utils/skeletons';
 import TableLayout, { ThNotSortable, ThSortable, getTableState, sortTableEntries } from './table';
+import { useAuthInfo } from '@propelauth/react';
 
 export default function TournamentsTable({
   swrTournamentsResponse,
@@ -23,7 +24,11 @@ export default function TournamentsTable({
   const { t } = useTranslation();
   const router = useRouter();
   const tableState = getTableState('name');
+  const authInfo = useAuthInfo();
 
+  if (authInfo.isLoggedIn && swrTournamentsResponse.error) {
+    return <div> Fetching data. This usually takes 5-15 seconds </div>
+  }
   if (swrTournamentsResponse.error) {
     return <RequestErrorAlert error={swrTournamentsResponse.error} />;
   }
@@ -31,8 +36,7 @@ export default function TournamentsTable({
     return <TableSkeletonSingleColumn />;
   }
 
-  const tournaments: Tournament[] =
-    swrTournamentsResponse.data != null ? swrTournamentsResponse.data.data : [];
+  const tournaments: Tournament[] = swrTournamentsResponse.data != null ? swrTournamentsResponse.data.data : [];
 
   const rows = tournaments
     .sort((p1: Tournament, p2: Tournament) => sortTableEntries(p1, p2, tableState))

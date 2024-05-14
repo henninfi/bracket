@@ -9,9 +9,7 @@ import { capitalize } from '../components/utils/util';
 import { getTournaments } from '../services/adapter';
 import Layout from './_layout';
 import { useAuthInfo } from '@propelauth/react'
-import { TournamentsService } from '../client/services/TournamentsService';
-import useSWR from 'swr';
-import { getTournamentEndpointFromRouter } from '../components/utils/util';
+
 
 
 export default function HomePage() {
