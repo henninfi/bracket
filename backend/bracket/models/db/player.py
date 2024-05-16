@@ -9,6 +9,7 @@ from bracket.utils.id_types import PlayerId, TournamentId
 
 class Player(BaseModelORM):
     id: PlayerId | None = None
+    uuid: str
     active: bool
     name: str
     created: datetime_utc
@@ -26,11 +27,13 @@ class Player(BaseModelORM):
 class PlayerBody(BaseModelORM):
     name: str = Field(..., min_length=1, max_length=30)
     active: bool
+    uuid: str
 
 
 class PlayerMultiBody(BaseModelORM):
     names: str = Field(..., min_length=1)
     active: bool
+    uuids: str
 
 
 class PlayerToInsert(PlayerBody):

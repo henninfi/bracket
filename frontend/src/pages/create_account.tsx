@@ -35,7 +35,7 @@ export default function CreateAccount() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   async function registerAndRedirect(values: any) {
-    const response = await registerUser(values, captchaToken);
+    const response = await registerUser();
 
     if (response != null && response.data != null && response.data.data != null) {
       localStorage.setItem('login', JSON.stringify(response.data.data));

@@ -11,6 +11,7 @@ from bracket.utils.errors import ForeignKey, check_foreign_key_violation
 from bracket.utils.id_types import ClubId
 from bracket.utils.types import assert_some
 from propelauth_fastapi import User as User_propelauth
+from bracket.routes.users import register_user
 
 router = APIRouter()
 
@@ -20,17 +21,23 @@ async def get_club_by_club_id(club_id: ClubId, user: User_propelauth = Depends(a
 
 @router.get("/clubs", tags=["Clubs"], response_model=ClubsResponse)
 async def get_clubs(user: User_propelauth = Depends(auth.require_user)) -> ClubsResponse:
-    return ClubsResponse(data=await get_clubs_for_user_id(assert_some(user.properties['bracket_id'])))
+    return ClubsResponse(data=await get_clubs_for_user_id(assert_some(user.user_id)))
 
 
 @router.post("/clubs", tags=["Clubs"], response_model=ClubResponse)
 async def create_new_club(
-    club: ClubCreateBody, user: User_propelauth = Depends(auth.require_user)
-) -> ClubResponse:
-    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
-    existing_clubs = await get_clubs_for_user_id(assert_some(bracket_user.id))
+    club: ClubCreateBody, user: User_propelauth = Depends(auth.require_user)) -> ClubResponse:
+    
+    user_id = user.user_id
+    bracket_user = await get_user_by_id(assert_some(user_id))
+
+        # If user does not have a bracket_id, create a bracket user
+    if not bracket_user:
+        bracket_user = await register_user(user_id)
+
+    existing_clubs = await get_clubs_for_user_id(assert_some(user_id))
     check_requirement(existing_clubs, bracket_user, "max_clubs")
-    return ClubResponse(data=await create_club(club, assert_some(bracket_user.id)))
+    return ClubResponse(data=await create_club(club, assert_some(user_id)))
 
 
 @router.delete("/clubs/{club_id}", tags=["Clubs"], response_model=SuccessResponse)

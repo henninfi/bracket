@@ -38,7 +38,7 @@ async def get_stages(
     user: User_propelauth = Depends(auth.require_user),
     no_draft_rounds: bool = False,
 ) -> StagesWithStageItemsResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    public_user = await get_user_by_id(assert_some(user.user_id))
     if no_draft_rounds is False and public_user is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

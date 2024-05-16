@@ -89,13 +89,14 @@ async def get_expired_demo_users() -> list[UserPublic]:
 
 async def create_user(user: User) -> User:
     query = """
-        INSERT INTO users (email, name, password_hash, created, account_type)
-        VALUES (:email, :name, :password_hash, :created, :account_type)
+        INSERT INTO users (id, email, name, password_hash, created, account_type)
+        VALUES (:id, :email, :name, :password_hash, :created, :account_type)
         RETURNING *
         """
     result = await database.fetch_one(
         query=query,
         values={
+            "id": user.id,
             "password_hash": user.password_hash,
             "name": user.name,
             "email": user.email,

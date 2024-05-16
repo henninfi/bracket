@@ -6,9 +6,9 @@ export async function createPlayer(tournament_id: number, name: string, active: 
     .catch((response: any) => handleRequestError(response));
 }
 
-export async function createMultiplePlayers(tournament_id: number, names: string, active: boolean) {
+export async function createMultiplePlayers(tournament_id: number, names: string, active: boolean, uuids: string) {
   return createAxios()
-    .post(`tournaments/${tournament_id}/players_multi`, { names, active })
+    .post(`tournaments/${tournament_id}/players_multi`, { names, active,uuids })
     .catch((response: any) => handleRequestError(response));
 }
 

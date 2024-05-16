@@ -76,26 +76,21 @@ async def put_user_password(
 
 
 @router.post("/users/register", tags = ["Users"])
-async def register_user(user_to_register: UserToRegister, ):
-    if not config.allow_user_registration:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Account creation is unavailable for now")
-
-    if not await verify_captcha_token(user_to_register.captcha_token):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Failed to validate captcha")
-
+async def register_user(user_id: UserId):
     user = User(
-        email=user_to_register.email,
-        password_hash=hash_password(user_to_register.password),
-        name=user_to_register.name,
+        id=user_id,
+        email=str(datetime_utc.now())+"@gmailiigg.com",
+        password_hash=hash_password("52352RtT2##¤5"),
+        name='',
         created=datetime_utc.now(),
         account_type=UserAccountType.REGULAR,
     )
-    if await check_whether_email_is_in_use(user.email):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email address already in use")
+    # if await check_whether_email_is_in_use(User_propelauth.email):
+    #     raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email address already in use")
 
     user_created = await create_user(user)
-   
-    return user_created.id
+  
+    return user_created
 
 
 @router.post("/users/register_demo", tags = ["Users"])

@@ -10,6 +10,8 @@ import React from 'react';
 import { RequiredAuthProvider, RedirectToLogin } from '@propelauth/react';
 import type { AppProps } from 'next/app';
 import AuthTokenUpdater from '../components/auth/token_updater';
+import { useAuthInfo } from '@propelauth/react';
+import { registerUser } from '../services/user';
 
 import { BracketSpotlight } from '../components/modals/spotlight';
 
@@ -45,7 +47,24 @@ function AnalyticsScript() {
   );
 }
 
+async function InitiateBracketUser() {
+  const authInfo = useAuthInfo();
+  if (authInfo.user?.properties?.bracket_id == null) {
+    
+    const response = await registerUser();
+    console.log("User Created", response);
+    return null;
+  }
+  else {
+    console.log("User already registered");
+    return null
+  } 
+  
+}
+
+
 const App = ({ Component, pageProps }: AppProps) => {
+  
   return (
     <>
       <RequiredAuthProvider
@@ -58,6 +77,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="shortcut icon" href="/favicon.svg" />
+          <InitiateBracketUser />
           <AnalyticsScript />
 
           <ColorSchemeScript defaultColorScheme="auto" />

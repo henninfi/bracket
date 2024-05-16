@@ -1,5 +1,6 @@
 import { UserBodyInterface, UserToRegisterInterface } from '../interfaces/user';
 import { createAxios, handleRequestError } from './adapter';
+import { useAuthInfo } from '@propelauth/react';
 
 export async function performLogin(username: string, password: string) {
   const bodyFormData = new FormData();
@@ -39,13 +40,14 @@ export async function updatePassword(user_id: number, password: string) {
     .catch((response: any) => handleRequestError(response));
 }
 
-export async function registerUser(user: UserToRegisterInterface, captchaToken: string | null) {
+export async function registerUser() {
+  const authInfo = useAuthInfo();
+  const rankit_user = authInfo.user
   return createAxios()
     .post('users/register', {
-      email: user.email,
-      name: user.name,
-      password: user.password,
-      captcha_token: captchaToken,
+      email: rankit_user?.email,
+      name: '',
+      password: '2ø4tn4¤#T3t34sdfgre#¤53453',
     })
     .catch((response: any) => handleRequestError(response));
 }

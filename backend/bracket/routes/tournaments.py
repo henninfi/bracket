@@ -57,7 +57,7 @@ async def get_tournament(
     tournament_id: TournamentId,
     user: User_propelauth | None = Depends(auth.require_user),
 ) -> TournamentResponse:
-    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    bracket_user = await get_user_by_id(assert_some(user.user_id))
     tournament = await sql_get_tournament(tournament_id)
     if bracket_user is None and not tournament.dashboard_public:
         raise unauthorized_exception
@@ -70,7 +70,7 @@ async def get_tournaments(
     user: User_propelauth | None = Depends(auth.require_user),
     endpoint_name: str | None = None,
 ) -> TournamentsResponse:
-    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    bracket_user = await get_user_by_id(assert_some(user.user_id))
     match bracket_user, endpoint_name:
         case None, None:
             raise unauthorized_exception
@@ -123,12 +123,12 @@ async def delete_tournament(
 async def create_tournament(
     tournament_to_insert: TournamentBody, user: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
-    bracket_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    bracket_user = await get_user_by_id(assert_some(user.user_id))
     existing_tournaments = await sql_get_tournaments((tournament_to_insert.club_id,))
     check_requirement(existing_tournaments, bracket_user, "max_tournaments")
 
     has_access_to_club = await get_user_access_to_club(
-        tournament_to_insert.club_id, assert_some(bracket_user.id)
+        tournament_to_insert.club_id, assert_some(user.user_id)
     )
     if not has_access_to_club:
         raise HTTPException(

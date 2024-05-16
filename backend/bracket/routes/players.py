@@ -87,7 +87,7 @@ async def create_single_player(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    public_user = await get_user_by_id(assert_some(user.user_id))
     existing_players = await get_all_players_in_tournament(tournament_id)
     check_requirement(existing_players, public_user, "max_players")
     await insert_player(player_body, tournament_id)
@@ -100,12 +100,15 @@ async def create_multiple_players(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
+    public_user = await get_user_by_id(assert_some(user.user_id))
     player_names = [player.strip() for player in player_body.names.split("\n") if len(player) > 0]
+    player_uuids = [player.strip() for player in player_body.uuids.split("\n") if len(player) > 0]
     existing_players = await get_all_players_in_tournament(tournament_id)
     check_requirement(existing_players, public_user, "max_players", additions=len(player_names))
 
-    for player_name in player_names:
-        await insert_player(PlayerBody(name=player_name, active=True),  tournament_id)
+    for idx, player_name in enumerate(player_names):
+        print(player_names)
+        print(player_uuids)
+        await insert_player(PlayerBody(name=player_name, active=True, uuid=player_uuids[idx]),  tournament_id)
 
     return SuccessResponse()

@@ -27,6 +27,7 @@ class Environment(EnumAutoStr):
 
 
 class Config(BaseSettings):
+    id: str | None = None
     admin_email: str | None = None
     admin_password: str | None = None
     allow_insecure_http_sso: bool = False
@@ -47,6 +48,7 @@ class CIConfig(Config):
 
 
 class DevelopmentConfig(Config):
+    id: Annotated[str, Field("development")]
     admin_email: Annotated[str, Field("test1@example.org")]
     admin_password: Annotated[str, Field("aeGhoe1ahng2Aezai0Dei6Aih6dieHoo")]
     allow_insecure_http_sso: Annotated[bool, Field(True)]

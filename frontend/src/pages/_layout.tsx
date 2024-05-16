@@ -151,6 +151,7 @@ export default function Layout({ children, additionalNavbarLinks, breadcrumbs }:
       }}
       padding="md"
     >
+      
       <HeaderAction
         links={getBaseLinksDict()}
         navbarState={navbarState}
@@ -159,5 +160,6 @@ export default function Layout({ children, additionalNavbarLinks, breadcrumbs }:
       <NavBar links={linksComponent} />
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
+    
   );
 }

@@ -97,6 +97,7 @@ async def create_admin_user() -> UserId:
 
     user = await create_user(
         User(
+            id=config.id,
             name="Admin",
             email=config.admin_email,
             password_hash=hash_password(config.admin_password),

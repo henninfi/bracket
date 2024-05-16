@@ -141,6 +141,7 @@ players = Table(
     "players",
     metadata,
     Column("id", BigInteger, primary_key=True, index=True),
+    Column("uuid", String, nullable=True, index=False, unique=False),
     Column("name", String, nullable=False, index=True),
     Column("created", DateTimeTZ, nullable=False),
     Column("tournament_id", BigInteger, ForeignKey("tournaments.id"), index=True, nullable=False),
@@ -155,8 +156,7 @@ players = Table(
 users = Table(
     "users",
     metadata,
-    Column("id", BigInteger, primary_key=True, index=True),
-    Column("uuid", String, nullable=True, index=True, unique=True),
+    Column("id", String, primary_key=True, index=True),
     Column("email", String, nullable=False, index=True, unique=True),
     Column("name", String, nullable=False),
     Column("password_hash", String, nullable=False),
@@ -177,7 +177,7 @@ users_x_clubs = Table(
     metadata,
     Column("id", BigInteger, primary_key=True, index=True),
     Column("club_id", String, ForeignKey("clubs.id", ondelete="CASCADE"), nullable=False),
-    Column("user_id", BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+    Column("user_id", String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
     Column(
         "relation",
         Enum(

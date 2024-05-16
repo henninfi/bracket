@@ -33,14 +33,16 @@ const handleImportPlayers = async () => {
     // Transform the fetched data to match the required payload format
     // Assuming 'response' is an array of player objects retrieved from somewhere
     const names = response.map(player => player.name).join('\n');
+    const uuids = response.map(player => player.id).join('\n');
 
     const payload = {
       names: names,
+      uuids: uuids,
       active: !response.some(player => player.isRetired)
     };
     console.log('payload', payload)
     // Sending transformed data to the same API as the multiple players creation
-    await createMultiplePlayers(tournament_id, payload.names, payload.active);
+    await createMultiplePlayers(tournament_id, payload.names, payload.active, payload.uuids);
     await swrPlayersResponse.mutate();
     setLoading(false);
     setOpened(false);

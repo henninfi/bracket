@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 class UserBase(BaseModelORM):
     id: UserId | None = None
-    bracket_id: int | None = None
     email: str
     name: str
     created: datetime_utc
@@ -31,7 +30,6 @@ class UserBase(BaseModelORM):
     
     @classmethod
     def from_object(cls:UserBase, user: User_propelauth_fastapi):
-        cls.bracket_id = user.properties['bracket_id']
         cls.email = user.email
 
         return cls

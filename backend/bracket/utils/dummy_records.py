@@ -172,6 +172,7 @@ DUMMY_TEAM4 = Team(
 DUMMY_PLAYER1 = Player(
     name="Player 01",
     active=True,
+    uuid="63e386c2-2897-427a-987a-f014edae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -179,6 +180,7 @@ DUMMY_PLAYER1 = Player(
 DUMMY_PLAYER2 = Player(
     name="Player 02",
     active=True,
+    uuid="63e386c2-2397-427a-987a-f014edae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -186,6 +188,7 @@ DUMMY_PLAYER2 = Player(
 DUMMY_PLAYER3 = Player(
     name="Player 03",
     active=True,
+    uuid="63e386d2-2897-427a-987a-f014edae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -193,6 +196,7 @@ DUMMY_PLAYER3 = Player(
 DUMMY_PLAYER4 = Player(
     name="Player 04",
     active=True,
+    uuid="63a386c2-2897-427a-987a-f014edae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -200,6 +204,7 @@ DUMMY_PLAYER4 = Player(
 DUMMY_PLAYER5 = Player(
     name="Player 05",
     active=True,
+    uuid="63e386c2-2897-427a-987a-f014eeae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -207,6 +212,7 @@ DUMMY_PLAYER5 = Player(
 DUMMY_PLAYER6 = Player(
     name="Player 06",
     active=True,
+    uuid="63e386c2-2897-427a-987a-f014edae622a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -214,6 +220,7 @@ DUMMY_PLAYER6 = Player(
 DUMMY_PLAYER7 = Player(
     name="Player 07",
     active=True,
+    uuid="61e386c2-2897-427a-987a-f014edae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
@@ -221,6 +228,7 @@ DUMMY_PLAYER7 = Player(
 DUMMY_PLAYER8 = Player(
     name="Player 08",
     active=True,
+    uuid="63e386c2-2897-427a-987a-f014ebae632a",
     created=DUMMY_MOCK_TIME,
     tournament_id=TournamentId(DB_PLACEHOLDER_ID),
 )
