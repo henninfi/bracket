@@ -15,7 +15,6 @@ from bracket.models.db.user import UserPublic
 from bracket.models.db.util import RoundWithMatches
 from bracket.routes.auth import auth
 from bracket.routes.models import SuccessResponse
-from bracket.routes.users import get_user_by_id
 from bracket.routes.util import (
     round_dependency,
     round_with_matches_dependency,
@@ -60,7 +59,6 @@ async def create_round(
     round_body: RoundCreateBody,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     await check_foreign_keys_belong_to_tournament(round_body, tournament_id)
 
     stages = await get_full_tournament_details(tournament_id)
@@ -70,7 +68,7 @@ async def create_round(
         for stage_item in stage.stage_items
         for round_ in stage_item.rounds
     ]
-    check_requirement(existing_rounds, public_user, "max_rounds")
+    check_requirement(existing_rounds, user.user_id, "max_rounds")
 
     stage_item = await get_stage_item(tournament_id, stage_item_id=round_body.stage_item_id)
 

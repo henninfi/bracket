@@ -22,7 +22,6 @@ from bracket.models.db.user import UserPublic
 from bracket.models.db.util import StageItemWithRounds
 from bracket.routes.auth import auth
 from bracket.routes.models import SuccessResponse
-from bracket.routes.users import get_user_by_id
 from bracket.routes.util import stage_item_dependency
 from bracket.sql.rounds import set_round_active_or_draft
 from bracket.sql.shared import sql_delete_stage_item_with_foreign_keys
@@ -58,7 +57,6 @@ async def create_stage_item(
     stage_body: StageItemCreateBody,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     if stage_body.team_count != len(stage_body.inputs):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -69,7 +67,7 @@ async def create_stage_item(
 
     stages = await get_full_tournament_details(tournament_id)
     existing_stage_items = [stage_item for stage in stages for stage_item in stage.stage_items]
-    check_requirement(existing_stage_items, public_user, "max_stage_items")
+    check_requirement(existing_stage_items, user.user_id, "max_stage_items")
 
     stage_item = await sql_create_stage_item(tournament_id, stage_body)
     await build_matches_for_stage_item(stage_item, tournament_id)

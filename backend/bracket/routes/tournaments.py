@@ -20,7 +20,6 @@ from bracket.models.db.tournament import (
 from bracket.models.db.user import UserPublic
 from bracket.routes.auth import auth
 from bracket.routes.models import SuccessResponse, TournamentResponse, TournamentsResponse
-from bracket.routes.users import get_user_by_id
 from bracket.schema import tournaments
 from bracket.sql.tournaments import (
     sql_delete_tournament,
@@ -57,23 +56,22 @@ async def get_tournament(
     tournament_id: TournamentId,
     user: User_propelauth | None = Depends(auth.require_user),
 ) -> TournamentResponse:
-    bracket_user = await get_user_by_id(assert_some(user.user_id))
     tournament = await sql_get_tournament(tournament_id)
-    if bracket_user is None and not tournament.dashboard_public:
+    if not tournament.dashboard_public:
         raise unauthorized_exception
 
     return TournamentResponse(data=tournament)
 
 
-@router.get("/tournaments", tags = ["Tournaments"], response_model=TournamentsResponse)
+@router.get("/tournaments", tags = ["Tournaments"])
 async def get_tournaments(
     user: User_propelauth | None = Depends(auth.require_user),
     endpoint_name: str | None = None,
-) -> TournamentsResponse:
-    bracket_user = await get_user_by_id(assert_some(user.user_id))
-    match bracket_user, endpoint_name:
-        case None, None:
-            raise unauthorized_exception
+):
+    
+    print('user', user.user_id)
+    print('endpoint_name', endpoint_name)
+    match user.user_id, endpoint_name:
 
         case _, str(endpoint_name):
             tournament = await sql_get_tournament_by_endpoint_name(endpoint_name)
@@ -85,13 +83,13 @@ async def get_tournaments(
                 )
             return TournamentsResponse(data=[tournament])
 
-        case _, _ if isinstance(bracket_user, UserPublic):
-            user_club_ids = await get_which_clubs_has_user_access_to(assert_some(bracket_user.id))
-            return TournamentsResponse(
-                data=await sql_get_tournaments(tuple(user_club_ids), endpoint_name)
-            )
-
-    raise RuntimeError()
+        case _, _ if isinstance(user.user_id, str):
+            user_club_ids = await get_which_clubs_has_user_access_to(assert_some(user.user_id))
+            data = await sql_get_tournaments(tuple(user_club_ids), endpoint_name)
+            tournaments =TournamentsResponse(data=data)
+            return tournaments
+                
+            
 
 
 @router.put("/tournaments/{tournament_id}", tags = ["Tournaments"], response_model=SuccessResponse)
@@ -123,9 +121,8 @@ async def delete_tournament(
 async def create_tournament(
     tournament_to_insert: TournamentBody, user: User_propelauth = Depends(auth.require_user)
 ) -> SuccessResponse:
-    bracket_user = await get_user_by_id(assert_some(user.user_id))
     existing_tournaments = await sql_get_tournaments((tournament_to_insert.club_id,))
-    check_requirement(existing_tournaments, bracket_user, "max_tournaments")
+    # check_requirement(existing_tournaments, user.user_id, "max_tournaments")
 
     has_access_to_club = await get_user_access_to_club(
         tournament_to_insert.club_id, assert_some(user.user_id)

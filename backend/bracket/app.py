@@ -73,8 +73,7 @@ routers = {
     "Stage_items": stage_items.router,
     "Stages": stages.router,
     "Teams": teams.router,
-    "Tournaments": tournaments.router,
-    "Users": users.router,
+    "Tournaments": tournaments.router
 }
 
 table_of_contents = "\n\n".join(
@@ -134,15 +133,15 @@ app.add_middleware(
 
 
 
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next: RequestResponseEndpoint) -> Response:
-    start_time = time.time()
-    request_metrics = get_request_metrics()
-    request_metrics.request_count[RequestDefinition.from_request(request)] += 1
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    request_metrics.response_time[RequestDefinition.from_request(request)] = process_time
-    return response
+# @app.middleware("http")
+# async def add_process_time_header(request: Request, call_next: RequestResponseEndpoint) -> Response:
+#     start_time = time.time()
+#     request_metrics = get_request_metrics()
+#     request_metrics.request_count[RequestDefinition.from_request(request)] += 1
+#     response = await call_next(request)
+#     process_time = time.time() - start_time
+#     request_metrics.response_time[RequestDefinition.from_request(request)] = process_time
+#     return response
 
 # # Define the rate-limiting middleware
 # @app.middleware("http")

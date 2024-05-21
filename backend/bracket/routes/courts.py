@@ -9,7 +9,6 @@ from bracket.models.db.court import Court, CourtBody, CourtToInsert
 from bracket.models.db.user import UserPublic
 from bracket.routes.auth import auth
 from bracket.routes.models import CourtsResponse, SingleCourtResponse, SuccessResponse
-from bracket.routes.users import get_user_by_id
 from bracket.schema import courts
 from bracket.sql.courts import get_all_courts_in_tournament, sql_delete_court, update_court
 from bracket.sql.stages import get_full_tournament_details
@@ -84,9 +83,8 @@ async def create_court(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SingleCourtResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     existing_courts = await get_all_courts_in_tournament(tournament_id)
-    check_requirement(existing_courts, public_user, "max_courts")
+    check_requirement(existing_courts, user.user_id, "max_courts")
 
     last_record_id = await database.execute(
         query=courts.insert(),

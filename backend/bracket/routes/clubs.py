@@ -5,13 +5,11 @@ from bracket.models.db.club import ClubCreateBody, ClubUpdateBody
 from bracket.models.db.user import UserPublic
 from bracket.routes.auth import auth
 from bracket.routes.models import ClubResponse, ClubsResponse, SuccessResponse
-from bracket.routes.users import get_user_by_id
 from bracket.sql.clubs import create_club, get_clubs_for_user_id, sql_delete_club, sql_update_club, sql_get_club_by_club_id
 from bracket.utils.errors import ForeignKey, check_foreign_key_violation
 from bracket.utils.id_types import ClubId
 from bracket.utils.types import assert_some
 from propelauth_fastapi import User as User_propelauth
-from bracket.routes.users import register_user
 
 router = APIRouter()
 
@@ -29,14 +27,12 @@ async def create_new_club(
     club: ClubCreateBody, user: User_propelauth = Depends(auth.require_user)) -> ClubResponse:
     
     user_id = user.user_id
-    bracket_user = await get_user_by_id(assert_some(user_id))
-
         # If user does not have a bracket_id, create a bracket user
-    if not bracket_user:
-        bracket_user = await register_user(user_id)
+    # if not bracket_user:
+    #     bracket_user = await register_user(user_id)
 
     existing_clubs = await get_clubs_for_user_id(assert_some(user_id))
-    check_requirement(existing_clubs, bracket_user, "max_clubs")
+    # check_requirement(existing_clubs, bracket_user, "max_clubs")
     return ClubResponse(data=await create_club(club, assert_some(user_id)))
 
 

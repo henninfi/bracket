@@ -11,7 +11,6 @@ from bracket.models.db.stage import Stage, StageActivateBody, StageUpdateBody
 from bracket.models.db.user import UserPublic
 from bracket.models.db.util import StageWithStageItems
 from bracket.routes.auth import auth
-from bracket.routes.users import get_user_by_id
 from bracket.routes.models import (
     StageItemInputOptionsResponse,
     StagesWithStageItemsResponse,
@@ -38,12 +37,6 @@ async def get_stages(
     user: User_propelauth = Depends(auth.require_user),
     no_draft_rounds: bool = False,
 ) -> StagesWithStageItemsResponse:
-    public_user = await get_user_by_id(assert_some(user.user_id))
-    if no_draft_rounds is False and public_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Can't view draft rounds when not authorized",
-        )
 
     stages_ = await get_full_tournament_details(tournament_id, no_draft_rounds=no_draft_rounds)
     return StagesWithStageItemsResponse(data=stages_)
@@ -79,9 +72,8 @@ async def create_stage(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     existing_stages = await get_full_tournament_details(tournament_id)
-    check_requirement(existing_stages, public_user, "max_stages")
+    # check_requirement(existing_stages, public_user, "max_stages")
 
     await sql_create_stage(tournament_id)
     return SuccessResponse()

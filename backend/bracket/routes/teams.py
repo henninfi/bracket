@@ -20,7 +20,6 @@ from bracket.routes.models import (
     SuccessResponse,
     TeamsWithPlayersResponse,
 )
-from bracket.routes.users import get_user_by_id
 from bracket.routes.util import team_dependency, team_with_players_dependency
 from bracket.schema import players_x_teams, teams
 from bracket.sql.teams import (
@@ -171,11 +170,10 @@ async def create_team(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SingleTeamResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     await check_foreign_keys_belong_to_tournament(team_to_insert, tournament_id)
 
     existing_teams = await get_teams_with_members(tournament_id)
-    check_requirement(existing_teams, public_user, "max_teams")
+    check_requirement(existing_teams, user.user_id, "max_teams")
 
     last_record_id = await database.execute(
         query=teams.insert(),
@@ -198,10 +196,9 @@ async def create_multiple_teams(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.properties['bracket_id']))
     team_names = [team.strip() for team in team_body.names.split("\n") if len(team) > 0]
     existing_teams = await get_teams_with_members(tournament_id)
-    check_requirement(existing_teams, public_user, "max_teams", additions=len(team_names))
+    # check_requirement(existing_teams, public_user, "max_teams", additions=len(team_names))
 
     for team_name in team_names:
         await database.execute(

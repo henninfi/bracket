@@ -1,4 +1,4 @@
-import { Button, Table } from '@mantine/core';
+import { Button, Table, Loader } from '@mantine/core';
 import { BiEditAlt } from '@react-icons/all-files/bi/BiEditAlt';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { TableSkeletonSingleColumn } from '../utils/skeletons';
 import TableLayout, { ThNotSortable, ThSortable, getTableState, sortTableEntries } from './table';
 import { useAuthInfo } from '@propelauth/react';
 
+
 export default function TournamentsTable({
   swrTournamentsResponse,
 }: {
@@ -27,7 +28,11 @@ export default function TournamentsTable({
   const authInfo = useAuthInfo();
 
   if (authInfo.isLoggedIn && swrTournamentsResponse.error) {
-    return <div> Fetching data. This usually takes 5-15 seconds </div>
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50vh' }}>
+    <Loader />
+  </div>
+  
+  
   }
   if (swrTournamentsResponse.error) {
     return <RequestErrorAlert error={swrTournamentsResponse.error} />;

@@ -5,7 +5,6 @@ from bracket.database import database
 from bracket.logic.subscriptions import check_requirement
 from bracket.models.db.player import Player, PlayerBody, PlayerMultiBody
 from bracket.models.db.user import UserPublic
-from bracket.routes.users import get_user_by_id
 from bracket.routes.auth import auth
 from bracket.routes.models import (
     PaginatedPlayers,
@@ -87,9 +86,8 @@ async def create_single_player(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.user_id))
     existing_players = await get_all_players_in_tournament(tournament_id)
-    check_requirement(existing_players, public_user, "max_players")
+    # check_requirement(existing_players, user.user_id, "max_players")
     await insert_player(player_body, tournament_id)
     return SuccessResponse()
 
@@ -100,11 +98,10 @@ async def create_multiple_players(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    public_user = await get_user_by_id(assert_some(user.user_id))
     player_names = [player.strip() for player in player_body.names.split("\n") if len(player) > 0]
     player_uuids = [player.strip() for player in player_body.uuids.split("\n") if len(player) > 0]
     existing_players = await get_all_players_in_tournament(tournament_id)
-    check_requirement(existing_players, public_user, "max_players", additions=len(player_names))
+    # check_requirement(existing_players, user.user_id, "max_players", additions=len(player_names))
 
     for idx, player_name in enumerate(player_names):
         print(player_names)
