@@ -173,7 +173,7 @@ async def create_team(
     await check_foreign_keys_belong_to_tournament(team_to_insert, tournament_id)
 
     existing_teams = await get_teams_with_members(tournament_id)
-    check_requirement(existing_teams, user.user_id, "max_teams")
+    # check_requirement(existing_teams, user.user_id, "max_teams")
 
     last_record_id = await database.execute(
         query=teams.insert(),
