@@ -28,7 +28,7 @@ async def asyncpg_init(connection: Any) -> None:
 #     cursor.close()
 
 
-database = Database(str(config.pg_dsn), init=asyncpg_init)
+database = Database(str(config.pg_dsn), init=asyncpg_init, min_size=1, max_size=5)
 
 engine = sqlalchemy.create_engine(str(config.pg_dsn))
 

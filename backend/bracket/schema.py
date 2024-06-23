@@ -177,7 +177,7 @@ users_x_clubs = Table(
     metadata,
     Column("id", BigInteger, primary_key=True, index=True),
     Column("club_id", String, ForeignKey("clubs.id", ondelete="CASCADE"), nullable=False),
-    Column("user_id", String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+    Column("user_id", String, nullable=False),
     Column(
         "relation",
         Enum(

@@ -86,8 +86,6 @@ async def create_single_player(
     tournament_id: TournamentId,
     user: User_propelauth = Depends(auth.require_user),
 ) -> SuccessResponse:
-    existing_players = await get_all_players_in_tournament(tournament_id)
-    # check_requirement(existing_players, user.user_id, "max_players")
     await insert_player(player_body, tournament_id)
     return SuccessResponse()
 

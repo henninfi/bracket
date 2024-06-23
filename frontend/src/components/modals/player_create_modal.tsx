@@ -74,6 +74,8 @@ function SinglePlayerTab({
   return (
     <form
       onSubmit={form.onSubmit(async (values) => {
+        console.log('values', values);
+        console.log('tournament_id', tournament_id)
         await createPlayer(tournament_id, values.name, values.active);
         await swrPlayersResponse.mutate();
         setOpened(false);

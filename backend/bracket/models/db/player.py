@@ -6,10 +6,12 @@ from pydantic import Field
 from bracket.models.db.shared import BaseModelORM
 from bracket.utils.id_types import PlayerId, TournamentId
 
+from typing import Optional
+
 
 class Player(BaseModelORM):
     id: PlayerId | None = None
-    uuid: str
+    uuid: Optional[str]
     active: bool
     name: str
     created: datetime_utc
@@ -27,8 +29,7 @@ class Player(BaseModelORM):
 class PlayerBody(BaseModelORM):
     name: str = Field(..., min_length=1, max_length=30)
     active: bool
-    uuid: str
-
+    uuid: Optional[str] = None
 
 class PlayerMultiBody(BaseModelORM):
     names: str = Field(..., min_length=1)
