@@ -10,7 +10,11 @@ const AuthTokenUpdater = () => {
     if (!process.env.NEXT_PUBLIC_API_RANKIT_URL) {
         throw new Error("API URL is not defined");
       }
-    
+    OpenAPI.BASE = process.env.NEXT_PUBLIC_API_RANKIT_URL as string;
+    OpenAPI.HEADERS = {
+        ...OpenAPI.HEADERS,
+        Authorization: `Bearer ${authInfo.accessToken}`,
+    };
     // When authInfo.
     useEffect(() => {
         OpenAPI.BASE = process.env.NEXT_PUBLIC_API_RANKIT_URL as string;
